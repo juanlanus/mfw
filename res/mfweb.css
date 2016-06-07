@@ -1,0 +1,94 @@
+  /*  reset */
+  html, body, div, span, object { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  iframe, h1, h2, h3, h4, h5, h6 { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  p, blockquote, pre, a, abbr { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  address, cite, code, del, dfn { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  em, img, ins, kbd, q, s, samp { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  small, strong, sub, sup, var { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  var, b, u, i, dl, dt, dd, ol { margin:0; padding:0; border:0; font-size:100%; vertical-align:baseline; }
+  body, html { margin:0; padding:0; font-family:sans-serif; }
+  body { margin-top:-17px; }
+  article { display:block; }
+  aside { display:block; }
+  details { display:block; }
+  figcaption { display:block; }
+  figure { display:block; }
+  footer { display:block; }
+  header { display:block; }
+  hgroup { display:block; }
+  menu { display:block; }
+  menu { display:block; }
+  section { display:block; }
+  table { border-collapse:collapse; border-spacing:0; }
+
+  /* page header */
+  .wf-header { height:79px; background-image:url(headerBackground.jpg); }
+  .wf-header img.wf-logo { margin-left:22px; float:left; }
+  .wf-header-menu li { display:inline-block; padding:6px; margin:8px; border:2px solid rgb(128,255,128); border-radius:6px; font-size:80%; }
+  .wf-header-menu li:hover { background-color:rgba(255, 255, 0, .2); }
+  .wf-info { float:right; }
+  .wf-info img { width:80px; height:auto; }
+
+  /* container */
+  .wf-container { width:100%; min-height:100%; clear:both; }
+
+  /* left col */
+  .wf-user-data { float:left; width:200px; min-height:444px; border-right:0px solid silver; margin-top:-33px; }
+  .wf-user-dataZZZ { background:repeating-linear-gradient(45deg, white, white 10px, rgb(222,222,222) 12px, rgb(0,0,0) 0px); }
+  .wf-user-picture { position:relative; height:222px; background-color:transparent; background-image:url(juan_lanus.jpg); background-size:cover; background-repeat:no-repeat; }
+  .wf-user-name { position:absolute; bottom:0px; left:0px; width:100%; text-align:center; color:white; font-size:133%; background:rgba(200,200,200,0.7) none repeat scroll 0% 0%; }
+  .wf-user-properties { font-size:70%; }
+  .wf-user-properties ul { list-style-type:none; padding-left:.5em; }
+  .wf-user-properties li { }
+  
+  
+  
+
+  /* right col */
+
+  .wf-e-header { }
+  .wf-e-h-period { max-width:555px; font-size:150%; color:rgb(160,160,160); margin-bottom:12px; margin-top:-16px; }
+  .wf-e-h-period-x { color:black; }
+  .ef-e-h-period-select { vertical-align:middle; float:right; }
+  .wf-e-h-what { color:rgb(160,160,160); }
+  .wf-e-h-who { font-weight:bold; color:black; }
+
+  .wf-evals-data{ margin-left:222px; margin-top:-33px; }
+  .wf-evals-data ul { list-style-type:none; padding-left:0; }
+  .wf-evals-data > ul > li { border-bottom:1px solid rgb(222,222,222); margin-bottom:6px; }
+  .wf-evals-data ul li p.wf-e-topic-name { font-size:80%; font-weight:bold; }
+  .wf-evals-data ul li p.wf-e-topic-age { color:rgb(160,160,160); font-size:70%; text-align:right; padding-right:2em; }
+
+  .wf-e { border:0px solid rgb(222,222,222); padding-left:0; }
+
+  .wf-e-topic-blah { width:160px; }
+  div.wf-e-topic-blah { display:inline-block; vertical-align:top; }
+
+  .wf-e-competences  { display:inline-block; text-align:top; vertical-align:top; }
+  .wf-e-comp div  { display:inline-block; }
+  ul.wf-e-comp    {  }
+  .wf-e-comp li   { }
+  .wf-e-comp li p {  }
+  .wf-e-comp-name { display:inline-block; font-size:70%; width:202px; vertical-align:top; padding-left:1em; }
+  .wf-e-comp-value { display:inline-block; vertical-align:top; }
+  .wf-e-comp-v-updown { display:inline-block; width:1.0em; font-size:70%; vertical-align:top; }
+  .wf-e-comp-v-number { display:inline-block; width:1.8em; vertical-align:top; }
+  .wf-e-comp-graph    { display:inline-block; width:auto; color:rgb(173,216,2); vertical-align:top; }
+  .wf-e-comp-v-pending { display:inline-block; font-size:70%; color:silver; padding-left:2.5em; }
+  .wf-e-comment { display:inline-block; font-size:70%; min-width:222px; width:28em; }
+
+  /* page footer */
+  .wf-footer { height:32px; background-color:rgb(222,222,222); position:fixed; bottom:0; left:0; clear:both; }
+
+  /* period selection popup */
+  .wf-sp-filter { width:444px; border:2px solid silver; border-radius:6px; background-color:rgb(248,248,248);
+  font-size:80%; position:absolute; left:177px; top:111px; display:none; }
+  .wf-sp-header { padding:8px; }
+  .wf-sp-header img { float:right; width:22px; height:auto; }
+  .wf-sp-body { border-top:1px solid silver; padding:8px; }
+  .wf-sp-body ul { list-style-type:none; }
+  .wf-sp-footer { text-align:right; padding:4px; }
+
+  /* test */
+  ul { border:0px solid rgb(244,244,244); }
+  li { border:0px solid rgb(240,240,240); }

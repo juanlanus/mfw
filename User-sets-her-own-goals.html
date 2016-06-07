@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>User sets her own goals - myFeedback</title>
+  <link rel="stylesheet" href="res/doc.css" type="text/css">
+  <script type="text/javascript" src="res/jquery/jquery.js">
+ </script>
+  <script type="text/javascript" src="res/doc.js">
+ </script>
+  <script type="text/javascript" src="./res/tocBuilder.js">
+ </script>
+  <link href="./res/jquery/tocBuilder.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript">
+        $(document).ready(function () {
+        });
+  </script>
+</head>
+
+<body>
+
+<div id="docHeader">
+<h1 style="display: inline; ">User sets her own goals</h1>
+</div>
+
+<div id="docLinks">
+
+<div id="tocContainer" class="tocContainer">
+
+<div class="toc">
+</div>
+</div>
+
+<p> </p>
+<hr>
+</div>
+
+<div id="docBody">
+<p>User selects or creates goals for a period at its outset. </p>
+
+<p>A goal is either selected from a list created by a manager, or added by the
+user. </p>
+
+<p>The goals can be quantitative <span
+style="text-decoration: line-through;">or qualitative</span>. </p>
+
+<p>There is a commit-like action that is not enabled until after the user has
+entered a compliant goals set, meaning that the number of items it contains is
+within the defined limits. </p>
+
+<h5>actors</h5>
+<ul>
+  <li>user: when editing her own goals</li>
+  <li>manager: when editing other user's goals (referred to as "user" in the
+    steps below) </li>
+</ul>
+
+<h5>steps</h5>
+<ol>
+  <li>user chooses an option to set or edit goals</li>
+  <li>system determines the current period</li>
+  <li>system reads the existing goals set for the period, or builds a new
+    (empty) goals set</li>
+  <li>system determines the editability of the user's goal set depending on the
+    dates, the ownership and the STATUS </li>
+  <li>until user selects an ending action (like commiting -if available- or
+    cancelling) system does the <a href="Edit-goals.html">Edit goal</a> UC with
+    the current goals definition 
+    <ol type="a">
+      <li>user terminated the interaction with a "commit" action 
+        <ol>
+          <li>system saves the goal set in local storage</li>
+          <li>system saves the goals set in the backend 
+            <ol type="a">
+              <li>backend returns OK 
+                <ol>
+                  <li>continue in step <a
+                  href="#goalsSaved">#goalsSaved</a></li>
+                </ol>
+              </li>
+              <li>backend returns error 
+                <ol>
+                  <li>depending on the error type, system might retry during a
+                    limited while, if successful continue in step <a
+                    href="#goalsSaved">#goalsSaved</a></li>
+                  <li>system informs user that the data was not saved</li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+          <li><a name="goalsSaved" id="#goalsSaved">goalsSaved</a>:
+          continue</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>system closes UI and returns to previous activity</li>
+</ol>
+
+<p> </p>
+
+<h5>sample goal set</h5>
+
+<p></p>
+
+<h5>data references</h5>
+
+<p>a goal within its associated topic ("axis"): </p>
+<ul>
+  <li>topic</li>
+  <li>name</li>
+  <li>expected value</li>
+  <li>goal weight</li>
+  <li>executed value</li>
+</ul>
+
+<p></p>
+
+<h5>business rules</h5>
+<ul>
+  <li><em><strong id="Editabilit">Editability of the goals set according to its
+    STATUS</strong></em> 
+    <p>For the sake of UI consistence the UI is always the same, it only
+    differs in which of its elements are enabled: </p>
+    <ol>
+      <li>the user is the goals owner: 
+        <ul>
+          <li>OPEN: fully editable </li>
+          <li>COMMITTED: the user can fill the executed values </li>
+          <li>APPROVED: accept the manager's intervention, eventually in
+            dissension</li>
+        </ul>
+      </li>
+      <li>the user is the manager of the goals owner: 
+        <ul>
+          <li>OPEN: this would be the manager pre-setting some of the goals of
+            an employee, may be as suggestions or if the user failed to set her
+            goals</li>
+          <li>COMMITTED: the manager can edit her dependent's goals choice and
+            expected values </li>
+          <li>APPROVED: the manager can edit her dependent's goals choice and
+            expected values (use case: the manager accepting a dissention) </li>
+        </ul>
+      </li>
+      <li>the user is a system administrator 
+        <ul>
+          <li>Allow for changing the STATUS of the goals set, so that the
+            manager can make any needed corrections (this is the only
+            interaction where the STATUS is shown)</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li><strong><em>Commit action availability</em></strong> 
+    <p>The number of goals to choose can have upper and lower bounds (BS: 2~4
+    por "eje"). </p>
+    <p>When all the goals in the set are within limits then this action is
+    enabled, else it's disabled. </p>
+    <p>An explanation should appear somewhere, like when the user hovers or
+    clicks the disabled button, or perhaps be permanently displayed. </p>
+  </li>
+  <li>The goals defined by the manager are bundled in sets that might have a
+    different name in each company, depending on its culture (BS: "ejes"
+    meaning "axis"). </li>
+  <li>The number of goals to create can have upper and lower bounds. </li>
+  <li>The goals can be set since the period is "opened" and there is a deadline
+    defined by the manager. </li>
+  <li>The information entered is saved as the user enters it, but it's still a
+    draft until after the user kind of commits it, then the goals enter the
+    workflow. </li>
+  <li>Once the user sets the goals ("commits") her manager is notified, for
+    approval request (workflow). </li>
+  <li>Users who haven't set their goals are prompted to do so at a pace
+    configured for the particular groups (or the whole company). </li>
+  <li>Managers are notified about users who haven't committed their goals yet,
+    as a report and as a push notification (especially when the deadline
+    approaches). </li>
+  <li>BS: 
+    <ul>
+      <li>Cada Eje contiene como mínimo 2 objetivos y como máximo 4
+      (standard)</li>
+      <li>Los objetivos deben promediarse entre sí y arrojar un resultado
+        final por Eje horizontal</li>
+      <li>Los ejes deben tener la posibilidad de evaluar un
+        "sobrecumplimiento" más allá del 100%.</li>
+      <li>El promedio mínimo de cumplimiento de cada eje es del 75% (¿qué
+        hace el sistema si no llegó?)</li>
+      <li>Peso ponderado de Objetivos por eje </li>
+      <li>Ejes en BS - 5 Ejes Independientes, Evaluaciones Horizontales (No
+        promedian cumplimientos entre sí): 
+        <ul>
+          <li>1 - Negocio</li>
+          <li>2 - Gestión Operacional</li>
+          <li>3 - Estrategia</li>
+          <li>4 - Gestión de Personas</li>
+          <li>5 - Riesgos. 
+            <p></p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+</div>
+</body>
+</html>

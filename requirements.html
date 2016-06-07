@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Requirements - myFeedback</title>
+  <link rel="stylesheet" href="res/doc.css" type="text/css">
+  <script type="text/javascript" src="res/jquery/jquery.js">
+ </script>
+  <script type="text/javascript" src="res/doc.js">
+ </script>
+  <script type="text/javascript" src="./res/tocBuilder.js">
+ </script>
+  <link href="./res/jquery/tocBuilder.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript">
+        $(document).ready(function () {
+        });
+  </script>
+</head>
+
+<body>
+
+<div id="docHeader">
+<h1 style="display: inline; ">Requirements</h1>
+</div>
+
+<div id="docLinks">
+
+<div id="tocContainer" class="tocContainer">
+
+<div class="toc">
+</div>
+</div>
+
+<p> </p>
+<hr>
+</div>
+
+<div id="docBody">
+<h2>functional</h2>
+
+<table id="inOut" class="borderTable inOut" style="width: 100%">
+  <col>
+  <col>
+  <col>
+  <col>
+  <tbody>
+    <tr>
+      <th style="width:22px;">#</th>
+      <th>Description</th>
+      <th style="width:22px;">in</th>
+      <th style="width:22px;">out</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td><a target="other"
+        href="Admin-edits-the-company-definitions.html">Admin edits the company
+        definitions</a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other"
+        href="Admin-bulk-loads-organization-tree.html">Admin bulk-loads
+        organization tree</a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="Admin-edits-organization-tree.html">Admin
+        edits organization tree</a><br>
+      </td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other"
+        href="Admin-edits-the-company-evaluations-period.html">Admin defines
+        upcoming evaluations period</a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>101</td>
+      <td><a target="other" href="#">Manager sets goals</a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>102</td>
+      <td><a target="other" href="#">User sees her pending actions<br>
+        As there is a workflow, a manager can have pending approvals and a user
+        can have pending notifications or other actions like setting goals and
+        the like. </a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">User sees her own tree </a><a
+        href="Edit-goals.html">Edit goal</a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>201</td>
+      <td><a target="other" href="User-sets-her-own-goals.html">User sets her
+        own goals</a></td>
+      <td>&#x2714; </td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a target="other" href="#">...</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>non-functional</h2>
+
+<h3>logging</h3>
+
+<p>All interactions are logged. The log entries must have enough information in
+order to identify the author, and their effect (like, for example, to be able
+to revert it by hand). Also, the log database must be read-only to averybody.
+</p>
+
+<p>This is a semantical security feature. THe client company would allow its
+employees, especially the admins, to be able to edit data that if incorectly
+manipulated might damage other employees careers. </p>
+
+<p>This includes all the administration and evaluations data, that is, pretty
+much everything. </p>
+
+<p>Those exerting such power must know that they are being logged, that is,
+that if they make an error the information to fix it will be available, and
+that if they attempt something dishonest they will be leaving traces clear
+behind them. </p>
+
+<p>Interactive data must include: </p>
+<ul>
+  <li>user</li>
+  <li>timestamp</li>
+  <li>workstation identification</li>
+  <li>URI</li>
+  <li>raw request data (with any passwords obscured)</li>
+</ul>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Edit goal - myFeedback</title>
+  <link rel="stylesheet" href="res/doc.css" type="text/css">
+  <script src="res/jquery-1.11.3.js"></script>
+  <script src="res/underscore.js"></script>
+  <script>
+    // EG is the global object that holds "Edit Goals" data
+    var EG = EG || {};
+  </script>
+  <script src="res/EG-fields-config.js" type="text/javascript"></script>
+</head>
+
+
+<body>
+
+  <div id="docHeader">
+    <h1 style="display: inline; ">Edit goal - prototype</h1>
+  </div>
+
+  <div id="docLinks">
+    <div id="tocContainer" class="tocContainer">
+      <div class="toc"></div>
+    </div>
+    <hr>
+  </div>
+
+  <div id="docBody">
+
+    <h5>
+      wireframe
+      <div style="display:inline-block; float:right">
+        <select id="stateSelector" title="select evaluation state">
+          <option value=20 selected>20 user at period outset</option>
+          <option value=30>30 supervisor at period outset</option>
+          <option value=40>40 user after supervisor´s check</option>
+          <option value=50>50 supervisor after period run</option>
+          <option value=60>60 user after period run</option>
+        </select>
+      </div>
+    </h5>
+    <style id="eg-styles">
+      /* prototype-scoped styles */
+      .proto-clickable:hover { background-color:yellow; }
+
+      /* global styles */
+
+      /* actual styles */
+      #editGoals { border:0px solid silver; padding:8px; border-radius:8px; min-width:450px; max-width:512px; }
+      #editGoals { font-size:1em; font-family:roboto, calibri, sans-serif; }
+      #editGoals p { margin:0; padding:0; }
+      #editGoals div { margin:0; padding:0; }
+      #editGoals p.eg-title { font-weight:bold; font-size:18px; }
+      #editGoals ul.eg-goals { list-style-type:none; font-size:12px; font-weight:200; }
+      #editGoals .eg-addOne { padding-left:40px; font-weight:bold; cursor:pointer; }
+
+      #editGoals table.eg-goals { margin-left:16px; border-collapse:collapse; empty-cells:show; width:96%; }
+      #editGoals table.eg-goals td { padding:1px; }
+      #editGoals table.eg-goals td > div[contenteditable="true"]:focus { outline:1px dotted blue; background-color:white; }
+      #editGoals table.eg-goals { font-size:9pt; font-weight:400; }
+      #editGoals .eg-goals-name { width:99%; }
+      #editGoals .eg-goals-name > div { background-image:url(res/select_arrow_grey.png); background-repeat:no-repeat; background-position:right; }
+      #editGoals .eg-goals-target { width:4em; min-width:4em; text-align:right; }
+      #editGoals .eg-goals-done   { width:4em; min-width:4em; text-align:right; }
+      #editGoals .eg-goals-percent { padding:2px; width:2em; min-width:2.8em; text-align:right; }
+      #editGoals .eg-goals-delete { font-size:12px; font-weight:200; cursor:pointer; line-height:90%; }
+
+      #editGoals .eg-newGoalButton { font-weight:bold; }
+
+      #editGoals .eg-goals-evaluation { margin-left:12px; font-size:12px; }
+      #editGoals .eg-goals-evaluation select { font-weight: bold; font-size: 18px;  -moz-appearance:none; border:0; width:14em; }
+      #editGoals .eg-goals-evaluation select:focus { height:auto; vertical-align:top; }
+      #editGoals .eg-goals-evaluation select:required:invalid { color:rgb(222,222,222); }
+      #editGoals .eg-goals-evaluation option[value=""][disabled] { display:none; }
+      #editGoals .eg-goals-evaluation option { color:black; }
+
+      #editGoals div.eg-newGoalButtons { text-align:right; }
+      #editGoals div.eg-newGoalButtons button { padding:4px; border-radius:6px; border:1px solid silver; }
+      #editGoals td { padding:0; }
+      #editGoals td > div { padding:2px; }
+      #editGoals td { height:14px; }
+      #editGoals div[contenteditable="true"] { overflow:hidden; white-space:nowrap; background-color:rgb(240,240,200); height:100%; }
+      #editGoals div[contenteditable="true"] * { display:none; }
+
+      #editGoals .eg-comment { margin-left:5%; border:1px solid blue; }
+      #editGoals .eg-comment[contenteditable="true"] { width:90%; height:120px; }
+
+      #editGoals td.eg-goal-choices { background-color:blue; }
+      #editGoals td.eg-goal-choices div { padding:0px; }
+      #editGoals td.eg-goal-choices div  select { margin:-1px; padding:0; }
+    </style>
+
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+
+    <script type="text/template" id="eg-template-oneAxis">
+
+      <% console.log( 'rc: ' + JSON.stringify( rc, null, 2 ) ); %>
+
+
+      <% var makeOneAxis = function( axis, iaxis ) { %>
+        <li><%= axis.name %>
+        <table class="eg-goals">
+          <tfoot>
+            <tr class="eg-newGoalButton">
+              <td colspan="5">
+                <span class="eg-addOne proto-clickable" title="click to add a new item" tabindex="10">[+]</span>
+              </td>
+            </tr>
+
+            <!-- add new goal row (hidden) ********************************************** -->
+            <tr class="eg-newGoal" style="display:none;">
+              <td class="eg-goals-name"><div tabindex="10"></div></td>
+              <td class="eg-goals-target"><div tabindex="10"></div></td>
+              <td class="eg-goals-done"><div tabindex="10"></div></td>
+              <td class="eg-goals-percent"><div></div></td>
+              <td class="eg-goals-delete proto-clickable"><div title="delete this item" tabindex="10">&#x2612;</div></td>
+            </tr>
+
+            <tr style="display:none;">
+              <td colspan="5">
+                <div class="eg-newGoalButtons">
+                  <button class="eg-newGoalButtonsCancel proto-clickable"
+                    onclick="
+                    $( this ).closest( '.eg-newGoal' ).css( 'display', 'none' )
+                    .parent().find( '.eg-addOne' ).css( 'display', 'block' );
+                    ">cancel</button>
+                  <button class="eg-newGoalButtonsAdd proto-clickable"
+                    onclick="
+                    $( this ).closest( '.eg-newGoal' ).css( 'display', 'none' )
+                    .parent().find( '.eg-addOne' ).css( 'display', 'block' );
+                    ">add</button>
+                </div>
+              </td>
+            </tr>
+
+          </tfoot>
+          <tbody>
+        <% _.each( axis.goals, function( oneItem, key, list ){ %>
+            <tr>
+              <td class="eg-goals-name"><div><%= oneItem.name %></div></td>
+              <td class="eg-goals-target"><div><%= oneItem.target %></div></td>
+              <td class="eg-goals-done"><div><%= oneItem.done %></div></td>
+              <td class="eg-goals-percent"><div><%= oneItem.percent %></div></td>
+              <td class="eg-goals-delete proto-clickable"><div title="delete this item" tabindex="10">&#x2612;</div></td>
+            </tr> <% }
+          ); %>
+
+          </tbody>
+        </table>
+      </li>
+      <% } %>
+
+
+      <% _.each(
+        rc,
+        function( axis, iaxis, axisList ){
+          makeOneAxis ( axis, iaxis );
+        }
+      ); %>
+
+    </script>
+
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+
+    <div id="editGoals" class="eg-editGoals">
+      <p id="eg-title" class="eg-title">Ejes - Definición de objetivos</p>
+
+      <ul id="eg-axis"> <!-- each LI is an axis, content is provided by the template output -->
+      </ul>
+
+      <div class="eg-goals-evaluation">
+        <p class="eg-title">Evaluation:
+          <!--
+          No Alcanzó:          Posee un incumplimiento de % mínimo en 3, 4 o 5 Ejes.
+          Necesita Mejorar:    Posee un incumplimiento de % en 1 o 2 Ejes.
+          Efectivo:            Posee un cumplimiento de 75% a 99%
+          Altamente Efectivo:  Posee un cumplimiento de 100% a 115%
+          Nivel de Excelencia: Posee un cumplimiento mayor que 115%
+          -->
+          <select class="eg-evaluation" name="axis-negocio" size="0">
+            <option value="" disabled selected>(select evaluation)</option>
+            <option value="1">No alcanzó</option>
+            <option value="2">Necesita mejorar</option>
+            <option value="3">Efectivo</option>
+            <option value="4">Altamente efectivo</option>
+            <option value="5">Nivel de excelencia</option>
+          </select>
+        </p>
+        <div class="eg-comment">
+          <div contenteditable=false ></div>
+        </div>
+        <div class="eg-acknowledge">
+          <label><input type="checkbox"/>acknowledge</label>
+        </div>
+      </div>
+
+      <!-- template for goal name descriptions (hidden) *************************** -->
+      <div class="eg-goal-choices" style="display:none;">
+        <select size="3" title="choose a predefined goal">
+          <option>+Colocaciones a plazo fijo (M$)</option>
+          <option>+Captación de nuevos clientes corporativos</option>
+          <option>+Captación de nuevos clientes personales</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+
+    <script> // run goals template
+      _.templateSettings.variable = 'rc';
+      var eg_goals_data = [ // named rc inside the template
+        {
+          name: "Negocio",
+          goals: [
+            { name: 'Colocaciones a plazo fijo (M$)', target: 2300, done: 2250, percent: '98%' },
+            { name: 'Captación de nuevos clientes corporativos', target: 300, done: 450, percent: '150%' },
+            { name: 'Captación de nuevos clientes personales', target: 700, done: 522, percent: '75%' }
+          ]
+        },
+        {
+          name: "Gestión Operacional",
+          goals: [
+            { name: 'Tiempo de respuesta en créditos', target: 10, done: 12, percent: '120%' },
+            { name: 'Tiempo de respuesta en renovaciones y ampliaciones', target: 7, done: 7, percent: '100%' },
+          ]
+        },
+        {
+          name: "Estrategia",
+          goals: []
+        },
+        {
+          name: "Gestión de Personas",
+          goals: []
+        },
+        {
+          name: "Riesgos",
+          goals: []
+        }
+      ];
+      var templateGoals = _.template( $( 'script#eg-template-oneAxis' ).html() );
+      var HTMLGoals = templateGoals( eg_goals_data );
+      console.log( HTMLGoals );
+      $( '#eg-axis' ).html( HTMLGoals );
+    </script>
+
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+
+    <h5><img src="res/caramba_yellow.gif"> tasks</h5>
+    <style>
+.doneItem             { color:#c0c0c0; }
+.doneItem a           { color:#a0a0f0; text-decoration:underline; }
+    </style>
+    <ol>
+      <li class="doneItem">Implement the building of the HTML using underscore
+      templates</li>
+      <li>The [+] button for adding new goals do not work in empty axis</li>
+      <li>The "Gestión Operacional" axis has no predefined goal names, should
+      not display the dropdown arrowheads</li>
+      <li>Define how to start the process of adding a new goal (empty row, [+]
+      button, add new goal button ...)</li>
+      <li class="doneItem">IE10 does not fire iput events on contenteditable
+      fields, use textinput event as a workaround</li>
+      <li class="doneItem"> Add the accept and the comment input controls</li>
+      <li>Make the comment field vertically resizable</li>
+      <li>Check the comment input for each of the workflow states</li>
+      <li>Adding new tabbable fields with a script breaks the tabbing order, as
+      the newly added ones position themselves after the existing ones</li>
+      <li>Hide the add new goal button when appropriate</li>
+      <li class="doneItem">Enable or disable input fields according to the state
+      of the evaluation</li>
+      <li class="doneItem">Replace input tags by contentEditable cells</li>
+      <li class="doneItem">Highlight a row that's being edited</li>
+      <li>Capture content changes during edition in order to persist them</li>
+      <li>Persist new data in localStorage</li>
+      <li class="doneItem">Calculate the percent done on each goal</li>
+      <li>Calculate the axis percent average</li>
+      <li class="doneItem">Recalculate the goal percent when target or done values
+      change</li>
+      <li class="doneItem">Delete [x] buttons not tabbable: wrap in a div?</li>
+      <li>Must control input data length in amounts cols, else the table
+      reflows</li>
+      <li>Must check that input data in amounts cols is numeric</li>
+      <li class="doneItem">When a new goal row is added, give focus to the first
+      input field</li>
+      <li>When an editable cell is entered via tab, select its content in full</li>
+      <li>Animate row deletion</li>
+      <li class="doneItem">Make the inserted row equal to normal rows, only with
+      the editable attributes</li>
+      <li class="doneItem">When an existing goal is clicked make it editable, or
+      make all editable fields editable at page outset,</li>
+      <li>Replace the <code>proto-clickable</code> class by something better</li>
+      <li>For new goal lines, hide the delete button [x], it's redundant with 
+      the cancel action</li>
+      <li class="doneItem">When the user selects a goal name from the predefineds,
+      all the names that were previously selected are replaced</li>
+      <li class="doneItem">Newly added rows do not have the [x] button handled:
+      delegate to the table and filter by target</li>
+      <li class="doneItem">Check if the add new goal works on a table with no
+      rows</li>
+      <li class="doneItem">Deleting all the goal rows but a newly added one, the
+      table shrinks because there are no wide-enough cells: give 99% to the name
+      cell, and fixed px widths to percent and delete cells (fixed by moving the
+      classes from the divs to the tds</li>
+      <li>After deleting a row capture ^Z to undo (reshow it)</li>
+      <li><img src="res/caramba_yellow.gif"> Implement the supervisor-suggested
+      goal description ("name") for the new-goal input</li>
+      <li>Disable or hide the [+] new goal button while a new goal is edited,
+      re-enable when the new goal has been committed</li>
+      <li><img src="res/caramba_yellow.gif">Newly added goal rows don't have the
+      click in the name event handler</li>
+      <li>Disable or hide the add-new-goal according to the max number of goals
+      allowed</li>
+      <li>Bind the esc and enter keys to the appropriate buttons</li>
+      <li>When the "Evaluation" dropdown opens, it pushes down the content below it,
+      should overlay it (position absolute?)</li>
+      <li>Close the "Evaluation" dropdown when the user clicks an option</li>
+      <li class="doneItem">The percent numbers should be aligned with the other
+      numbers of the row</li> 
+      <li>When the target and done numbers are edited, recalculate the percent on
+      the change event</li>
+      <li><img src="res/caramba_yellow.gif"> In contenteditable fields the paste
+      action had a regression, again is pasting "rich" text</li>
+      <li class="doneItem">In contenteditable fields the paste action includes
+      html tags that mimic the copied source format, a hack is needed to paste
+      plain text (handle the paste event - before pasting - and the input event -
+      after pasting
+      http://stackoverflow.com/questions/30254675/a-plain-text-single-line-contenteditable-div
+      </li>
+      <li>In contenteditable fields a space at the end of the text becomes a nbsp
+      when text is pasted after it</li>
+      <li class="doneItem">The evaluation, like "Efectivo", requires like minimum
+      75% in each of the 5 "ejes", so the evaluation artifact belongs below the
+      5 ejes</li>
+      <li>Contenteditable fields must have an absolute width</li>
+      <li>Calculate and display average % <em>per axis</em> below each eje</li>
+      <li class="doneItem">Input cells must have overflow-x:hidden, input text
+      must not fold neither the cell expand, seems width has to be set as an
+      absolute value</li>
+      <li class="doneItem">Capture and eat any new-lines entered in the inputs</li>
+      <li>Newlines are being deleted, check that they are not meningful</li>
+    </ol>
+
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+
+  </div>
+  </body>
+  </html>

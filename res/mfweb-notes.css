@@ -1,0 +1,7 @@
+  /*  reset */
+  body, html { margin:0; padding:0; font-family:sans-serif; }
+  table { border-collapse:collapse; border-spacing:0; }
+  pre { font-size:80%; background-color:rgb(240,240, 222); }
+
+  body { font-size:70%; padding:12px; }
+  .n-UI-ref { background-color:rgb(244,244,100); padding:4px; }

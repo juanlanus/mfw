@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Give evaluations - myFeedback</title>
+  <link rel="stylesheet" href="res/doc.css" type="text/css">
+  <script src="res/jquery-1.11.3.js"></script>
+  <script src="res/underscore.js"></script>
+  <script src="res/jquery.quicksearch.js"></script>
+  <script>
+    // GE is the global object that holds "Give Evaluations" data
+    var GE = GE || {};
+    _.templateSettings.variable = 'u';
+  </script>
+  <script src="res/GE-test-users.js"></script>
+  <script src="res/GE-give-evaluations.js"></script>
+</head>
+
+
+<body>
+
+  <div id="docHeader">
+    <h1 style="display: inline; ">Give evaluations - prototype</h1>
+  </div>
+
+  <div id="docLinks">
+    <div id="tocContainer" class="tocContainer">
+      <div class="toc"></div>
+    </div>
+    <hr>
+  </div>
+
+  <div id="docBody" style="max-width:48em;">
+
+    <style id="GE-styles">
+      /* prototype-scoped styles */
+      .proto-clickable:hover { background-color:yellow; }
+
+      /* global styles */
+
+      /* actual styles */
+      #ge-evalueeGroups p.ge-title { font-weight:bold; font-size:18px; }
+
+      .ge-users-group { list-style-type:none; margin-left:0; padding-left:0; }
+      .ge-oneUser { /* container */ width:100%; min-height:60px; }
+      .ge-user-picture { float:left; overflow-x:hidden; height:60px; width:60px; margin-right:1em;
+                        background-color:transparent; background-size:cover; background-repeat:no-repeat; 
+      cursor:pointer; }
+      .ge-user-data { min-height:60px; box-sizing:border-box; color:black; font-size:90%;
+                        background-color:rgb(248,248,248); border-bottom:1px solid rgb(232,232,232);
+                        cursor:pointer; }
+      .ge-user-name { width:100%; box-sizing:border-box; margin:0; padding:2px; color:rgb(0,0,0);
+        font-size:100%; font-weight:bold; }
+      .ge-field-name { color:rgb(192,192,192); font-size:80%; padding-ledt:8px; }
+      .ge-field-name:before { content:" "; display:inline-block; width:12px; }
+      .ge-field-name:after  { content:" "; }
+      .ge-field-value { color:rgb(96,96,96); font-weight:normal; }
+      .ge-nickname        { font-style:italic; font-weight:normal; }
+      .ge-nickname:before { content:" \""; }
+      .ge-nickname:after  { content:"\" "; }
+
+      .ge-evaluations { display:none; }
+
+
+
+      .ge-evalueesGroup {  }
+
+      .ge-title {  }
+      .ge-oneUser {  }
+      .ge-user-picture {  }
+      .ge-user-data {  }
+      .ge-user-name {  }
+      .ge-nickname {  }
+      .ge-user-fields {  }
+      .ge-field-name {  }
+      .ge-field-value {  }
+
+      .ge-evaluations { margin:12px; }
+      .ge-evaluations { box-sizing:border-box; }
+      .ge-evaluations *, .ge-evaluations *:before, .ge-evaluations *:after { box-sizing:inherit; }
+
+      .ge-e-item { min-height:24px; position:relative; background-color:transparent; }
+      .ge-e-number { position:relative; min-height:22px; }
+      .ge-e-number.ge-e-value { background-color:rgb(240,240,240); }
+      .ge-e-value { width:85%; min-height:22px; height:100%; margin:0; margin:2px; background-color:rgb(240,240,240); }
+      .ge-e-value:hover { cursor:pointer; outline:1px dotted rgb(128,128,128); }
+      .ge-e-value-A { min-height:22px; height:100%; float:left; background-color:rgb(192,192,255); }
+      .ge-e-value-error { background-color:rgb(255,255,0); }
+      .ge-e-name { position:absolute; top:0; left:0; color:rgb(80,80,80); font-size:85%; padding-left:9px; padding-top:3px; }
+      .ge-e-name { pointer-events:none; }
+      .ge-e-name-optional { color:rgb(96,96,196); }
+      .ge-e-display { position:absolute; top:-1px; right:0; color:rgb(80,80,80); font-size:85%; font-weight:bold; padding:4px; 
+        padding-left:0; text-align:right; vertical-align:super; width:14%; height:24px; }
+      .ge-e-display-hovered { color:white; background-color:black; outline:1px dotted rgb(128,128,128); }
+
+      .ge-e-header { min-height:24px; margin-top:2px; padding-top:2px; background-color:rgb(128,128,128); color:rgb(255,255,255);
+        font-size:100%; text-align:center; border:1px solid transparent; border-radius:6px; }
+
+      .ge-e-p100 {  }
+
+      .ge-e-binary { }
+      .ge-e-binary-yes { min-height:22px; height:100%; width:100%; float:left; background-color:rgb(192,192,255); }
+      .ge-e-binary-no  { min-height:22px; height:100%; width:100%; float:right; background-color:rgb(240,240,240); }
+
+      .ge-e-step {  }
+      .ge-e-step table { width:100%; height:22px; table-layout:fixed; }
+      .ge-e-one-step { height:22px; height:100%; color:white; margin:0; padding:0; 
+        vertical-align:bottom; font-size:70%; text-align:center; border-right:1px solid rgb(255,255,255); }
+      .ge-e-one-step.ge-e-one-step-on  { background-color:rgb(192,192,255); }
+      .ge-e-one-step.ge-e-one-step-off { background-color:rgb(240,240,240); }
+      .ge-e-one-step:hover { color:black; z-order:99; }
+
+      .ge-e-item { clear:both; }
+       
+      .ge-e-spacer { height:22px; font-size:80%; border-bottom:1px solid black; }
+
+      #userFilterBox { margin:0px; padding-bottom:10px; padding-left:10px; padding-top:0px; position:fixed; top:0; right:0; }
+      #userFilter { background-image:url(res/search.icon_34x25.png); background-repeat:no-repeat; background-position:100% 50%; background-size:auto 90%; }
+      #userFilter { border:2px solid silver; border-radius:4px; padding:0 6px; width:14em; line-height:125%; }
+      .hiddenByQS { display:none; }
+
+    </style>
+
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+    <!-- **************************************************************************** -->
+
+    <div id="userFilterBox" style="float:right;">
+      <input type="search" id="userFilter" tabindex="1" placeholder="enter any people data"/>
+    </div>
+
+    <div id="ge-evalueeGroups" class="ge-evalueeGroups">
+
+      <script type="text/template" id="ge-template-users"> <!-- build a group of users -->
+
+      <% var makeUsersGroup = function( group, igroup ) { %>
+      <% var users = GE.selectUsers( group.groupId, GE.usersAlreadyListed ); %>
+        <div class="ge-evalueesGroup" id="ge-evaluees-<%= group.groupName %>">
+          <p id="ge-title-<%= group.groupName %>" class="ge-title"><%= group.groupDescription %></p>
+          <ul class="ge-users-group">
+            <% _.each( users, function( user, key, list ){ %>
+            <li class="ge-oneUser" id="<%= 'ge-user-' + user.id %>" tabindex="0">
+              <div class="ge-user-picture" style="background-image:url(res/<%= user.profileImageCode %>.jpg);"></div>
+              <div class="ge-user-data">
+                <p class="ge-user-name"><%= user.firstName + ' ' + user.lastName %>
+                <% if( user.nickname && false ) {%><span class="ge-nickname" title="nickname"><%= user.nickname %></span><% } %></p>
+                <div class="ge-user-fields">
+                  <p> <span class="ge-field-value"><%= user.seniority %></span>
+                  <% if( user.area ){%><span class="ge-field-name">area:</span><span class="ge-field-value"><%= user.area %></span><% } %>
+                  <% if( user.project ){%><span class="ge-field-name">project:</span><span class="ge-field-value"><%= user.project %></span></p><% } %>
+                  <span style="display:inherit; font-size:0;"><%= user.searchCriteria %></span>
+                </div>
+              </div>
+              <div id="ge-evaluations-<%= user.id %>" class="ge-evaluations"></div> <!-- insert evals here -->
+            </li> <% }); %>
+          </ul>
+        </div> <% } %>
+
+      <% _.each(
+        u,
+        function( group, igroup, groupsList ){
+          makeUsersGroup ( group, igroup );
+        }
+      ); %>
+
+    </script>
+
+    <div id="ge-padding">&nbsp;</div>
+  </div>
+
+  <!-- **************************************************************************** -->
+  <!-- **************************************************************************** -->
+  <!-- **************************************************************************** -->
+
+  <div id="hardCodedEvaluationsInputContext">
+    <div id="ge-evaluations-5-hardCoded" class="ge-evaluations" style="display:none;">
+
+      <!-- items group header sample -->
+      <div id="ge-e-item-1" class="ge-e-item ge-e-header">First group of eval items</div>
+
+      <!-- number value sample -->
+      <div id="ge-e-item-2" class="ge-e-item ge-e-number" data="">
+        <div class="ge-e-value">
+          <div class="ge-e-value-A" style="width:50%;">&nbsp;</div>
+        </div>
+        <div class="ge-e-name">Positive idiosyncrasy</div>
+        <div class="ge-e-display" contenteditable="true" tabindex="0" title="out of 3000"></div>
+      </div>
+
+      <!-- percent value sample -->
+      <div id="ge-e-item-3" class="ge-e-item ge-e-p100">
+        <div class="ge-e-value">
+          <div class="ge-e-value-A" style="width:50%;">&nbsp;</div>
+        </div>
+        <div class="ge-e-name">Anthropometric synergic attitude</div>
+        <div class="ge-e-display" contenteditable="false" tabindex="0"></div>
+      </div>
+
+      <!-- yes/no value sample -->
+      <div id="ge-e-item-4" class="ge-e-item ge-e-binary">
+        <div class="ge-e-value">
+          <div class="ge-e-binary-yes">&nbsp;</div> <!-- ✓ &#x274c; ❌ &#x2713; -->
+        </div>
+        <div class="ge-e-name">Is a natural leadership junkie</div>
+        <div class="ge-e-display" tabindex="0"></div>
+      </div>
+
+      <!-- items group header sample -->
+      <div id="ge-e-item-5" class="ge-e-item ge-e-header">Second group of eval items</div>
+
+      <!-- binary item sample -->
+      <div id="ge-e-item-6" class="ge-e-item ge-e-binary">
+        <div class="ge-e-value">
+          <div class="ge-e-binary-no">&nbsp;</div>
+        </div>
+        <div class="ge-e-name">Has that success tendency</div>
+        <div class="ge-e-display" tabindex="0"></div> <!-- ✓ &#x274c; ❌ &#x2713; -->
+      </div>
+
+      <!-- stepped value sample -->
+      <div id="ge-e-item-7" class="ge-e-item ge-e-step">
+        <div class="ge-e-value">
+          <table>
+            <tbody><tr>
+              <td class="ge-e-one-step ge-e-one-step-on" style=" width:20%; ">awful</td>
+              <td class="ge-e-one-step ge-e-one-step-on" style=" width:20%; ">low</td>
+              <td class="ge-e-one-step ge-e-one-step-off" style=" width:20%; ">regular</td>
+              <td class="ge-e-one-step ge-e-one-step-off" style=" width:20%; ">high</td>
+              <td class="ge-e-one-step ge-e-one-step-off" style=" width:20%; ">impressing
+              </td>
+            </tr>
+          </tbody></table>
+        </div>
+        <div class="ge-e-name">Advise acceptance</div>
+        <div class="ge-e-display" contenteditable="false" tabindex="0">&nbsp;</div>
+      </div>
+
+      <!-- bottom spacer sample -->
+      <div id="ge-e-item-8" class="ge-e-item ge-e-spacer">&nbsp;</div>
+
+    </div>
+  </div>
+
+
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+
+</body>
+</html>

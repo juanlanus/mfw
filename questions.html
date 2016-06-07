@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Questions - myFeedback</title>
+  <link rel="stylesheet" href="res/doc.css" type="text/css">
+  <script type="text/javascript" src="res/jquery/jquery.js">
+ </script>
+  <script type="text/javascript" src="res/doc.js">
+ </script>
+  <script type="text/javascript" src="./res/tocBuilder.js">
+ </script>
+  <link href="./res/jquery/tocBuilder.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript">
+        $(document).ready(function () {
+        });
+  </script>
+</head>
+
+<body>
+
+<div id="docHeader">
+<h1 style="display: inline; ">Questions</h1>
+</div>
+
+<div id="docLinks">
+
+<div id="tocContainer" class="tocContainer">
+
+<div class="toc">
+</div>
+</div>
+
+<p> </p>
+<hr>
+</div>
+
+<div id="docBody">
+<h2>local</h2>
+<ul>
+  <li>We should define an API and publish it, for the clients to be able to
+    integrate this application with theirs. 
+    <p>Then, we should model all our services after that API, instead of having
+    a number of tiny interactions. </p>
+    <p>The consolidation of the backend actions in a lean small number of basic
+    actions would hide the actual design of the database schema, allowing us to
+    evolve it as needed. </p>
+  </li>
+  <li>In the topics table we need a text instructions field, to be shown to the
+    user, like "enter from 2 to 4 goals in this axis". 
+    <p>This is needed bacause else the user wouldn't know why the "commit"
+    button is not enabled (like, if she chose 5 goals). </p>
+  </li>
+  <li>No traceability: some tables loaded by the user's interactions lack a
+    timestamp. </li>
+  <li>No change management: the topics table lacks an end date (and perhaps a
+    start date). </li>
+  <li>The <code>tm_translations</code> table should include the organization
+    id in its clave, in order to cater for the different names each company
+    culture assigns to the application objects like "topics" and "competences".
+    Alternatively, something similar could be achieved through configuration,
+    like ODBC does. Fo example in BS the word for "topic" is "eje". </li>
+  <li>The table <code>tm_countries</code> should have a column holding the
+    default language, for global organizations that have employees in different
+    locations. Same for <code>tm_organization_offices</code>. </li>
+  <li>Fields like <code>name</code> in <code>tm_organization_offices</code>
+    should be translatable. </li>
+  <li>The generalized idea is that the user sets a quantitative goal and then
+    she starts to grow a number attempting to reach her goal. But, in some
+    cases it might happen that she starts with a value and tries to
+    <em>reduce</em> it, for example in cases like errors or risks. 
+    <p>Will the client ask us for diminishing goals? </p>
+  </li>
+</ul>
+
+<h2>BS</h2>
+<ul>
+  <li>According to <a
+    href="https://docs.google.com/document/d/1aIpU_L0LTg7UY7XI6B_HibGOeAKzekRnP62_mi20Q9o/edit">the
+    Supervielle Smart evals doc</a>, the weight of each goal is set by the
+    user. 
+    <p>On the other hand, the database schema seems to define the ponderation
+    factor as a property of a competence, n a creepy way. </p>
+    <p>Which one is right?</p>
+    <pre>CREATE TABLE smarteval_competencies (
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+enabled INT NOT NULL DEFAULT 0, 
+topicId BIGINT NOT NULL,
+    orderNumber INT NOT NULL DEFAULT 0, 
+    type VARCHAR(30),
+CONSTRAINT fkCompetencyTopic FOREIGN KEY (topicId) REFERENCES smarteval_topics (id)
+);
+
+CREATE TABLE smarteval_competencies_weighted (
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+weight FLOAT NOT NULL,
+    CONSTRAINT fkCompetencyWeightedCompetency FOREIGN KEY (id) REFERENCES smarteval_competencies (id)
+)
+
+Note: I see a design issue here, as the PK of the related table is an autonumber too, while it should be set as a copy of the target table's PK. 
+It might happen that a competency is created without its eaight: the PKs would be out of sync from now on. </pre>
+  </li>
+</ul>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+</div>
+</body>
+</html>

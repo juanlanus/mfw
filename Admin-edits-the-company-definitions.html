@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Admin edits the company definitions - myFeedback</title>
+  <link rel="stylesheet" href="res/doc.css" type="text/css">
+  <script type="text/javascript" src="res/jquery/jquery.js">
+ </script>
+  <script type="text/javascript" src="res/doc.js">
+ </script>
+  <script type="text/javascript" src="./res/tocBuilder.js">
+ </script>
+  <link href="./res/jquery/tocBuilder.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript">
+        $(document).ready(function () {
+        });
+  </script>
+</head>
+
+<body>
+
+<div id="docHeader">
+<h1 style="display: inline; ">Admin edits the company definitions</h1>
+</div>
+
+<div id="docLinks">
+
+<div id="tocContainer" class="tocContainer">
+
+<div class="toc">
+</div>
+</div>
+
+<p> </p>
+<hr>
+</div>
+
+<div id="docBody">
+<p>Admin interactively enters the company definitions, using as many screens as
+needed. </p>
+
+<p>The first screens should comtain the items that influence the data that will
+be needed, for example in a goal-oriented company the goals interaction context
+has to be shown else no. </p>
+
+<p>The data involved is the following: </p>
+<ul>
+  <li>properties 
+    <ul>
+      <li>evaluation type: feedback, goal-oriented, ... </li>
+      <li>period type: non-periodic, month, year. </li>
+      <li>user fields</li>
+    </ul>
+  </li>
+  <li>periods 
+    <p>A period has a starting and an ending date, determined by the company's
+    period type. </p>
+    <p>Additionally, it has an opening date (users can start loading data for
+    the period) and a closing date (users -except admin- can't load any more
+    data for that period). </p>
+  </li>
+  <li>topics and competences</li>
+  <li>goals 
+    <ul>
+      <li>axis</li>
+      <li>order</li>
+      <li>name</li>
+      <li>description</li>
+      <li>value type</li>
+      <li>weight</li>
+      <li>applicability filter<br>
+        Like, a regex matching those who can choose this goal. This is so
+        because different parts of the company, or people performing different
+        fuctions, will need specialized goals. </li>
+    </ul>
+  </li>
+</ul>
+
+<p></p>
+
+<p>user: </p>
+<pre>public class UserDTO {
+    private long id;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String nickname;
+    private String email;
+    private String phoneNumber;
+    private String job;
+    private String seniority;
+    private String area;
+    private String account;
+    private String project;
+    private String organizationName;</pre>
+
+<p> </p>
+
+<h5>The schema as of 2015-11-17</h5>
+<ul
+style="font-family:monospace; font-size:70%; color:rgb(160,160,160);  list-style-type:none; column-count:2; column-gap:4px; -moz-column-count:3; -moz-column-gap:4px; -webkit-column-count:3; -webkit-column-gap:4px;">
+  <li><a href="#tm_images">tm_images </a></li>
+  <li><a href="#tm_languages">tm_languages </a></li>
+  <li><a href="#tm_languages_lang">tm_languages_lang </a></li>
+  <li><a href="#tm_countries">tm_countries </a></li>
+  <li><a href="#tm_organizations">tm_organizations </a></li>
+  <li><a href="#tm_organization_files">tm_organization_files</a></li>
+  <li><a href="#tm_modules">tm_modules </a></li>
+  <li><a href="#tm_organization_modules">tm_organization_modules </a></li>
+  <li><a href="#tm_organization_offices">tm_organization_offices </a></li>
+  <li><a href="#tm_users">tm_users </a></li>
+  <li><a href="#tm_users_preferences">tm_users_preferences </a></li>
+  <li><a href="#tm_translations">tm_translations </a></li>
+  <li><a href="#smu_organization_values">smu_organization_values </a></li>
+  <li><a href="#smu_organization_values_lang">smu_organization_values_lang
+  </a></li>
+  <li><a href="#smu_stars">smu_stars </a></li>
+  <li><a href="#smu_comments">smu_comments </a></li>
+  <li><a href="#smu_organization_properties">smu_organization_properties
+  </a></li>
+  <li><a href="#smu_stars_periods">smu_stars_periods </a></li>
+  <li><a href="#tm_roles">tm_roles </a></li>
+  <li><a href="#tm_users_roles">tm_users_roles </a></li>
+  <li><a href="#smu_notifications">smu_notifications </a></li>
+  <li><a href="#tm_groups">tm_groups </a></li>
+  <li><a href="#tm_users_groups">tm_users_groups </a></li>
+  <li><a href="#tm_tasks">tm_tasks </a></li>
+  <li><a href="#tm_users_devices">tm_users_devices </a></li>
+  <li><a href="#tm_access_logs">tm_access_logs </a></li>
+  <li><a href="#tm_given_star_logs">tm_given_star_logs </a></li>
+  <li><a href="#tm_external_skills">tm_external_skills </a></li>
+  <li><a href="#tm_skills">tm_skills </a></li>
+  <li><a href="#tm_users_files">tm_users_files </a></li>
+  <li><a href="#tm_oauth_tokens">tm_oauth_tokens </a></li>
+  <li><a href="#tm_price_list">tm_price_list </a></li>
+  <li><a href="#am_achievements">am_achievements </a></li>
+  <li><a href="#am_entities">am_entities </a></li>
+  <li><a href="#am_entity_properties">am_entity_properties </a></li>
+  <li><a href="#am_comparators">am_comparators </a></li>
+  <li><a href="#am_functions">am_functions </a></li>
+  <li><a href="#am_criteria">am_criteria </a></li>
+  <li><a href="#am_conditions">am_conditions </a></li>
+  <li><a href="#am_criteria_fulfilled">am_criteria_fulfilled </a></li>
+  <li><a href="#am_badges">am_badges </a></li>
+  <li><a href="#smarteval_org_chart">smarteval_org_chart </a></li>
+  <li><a href="#smarteval_evaluations">smarteval_evaluations </a></li>
+  <li><a href="#smarteval_evaluations_matrix">smarteval_evaluations_matrix
+  </a></li>
+  <li><a href="#smarteval_evaluations_quick">smarteval_evaluations_quick
+  </a></li>
+  <li><a href="#smarteval_topics">smarteval_topics </a></li>
+  <li><a
+    href="#smarteval_topic_per_seniority_job">smarteval_topic_per_seniority_job
+    </a></li>
+  <li><a href="#smarteval_competencies">smarteval_competencies </a></li>
+  <li><a
+    href="#smarteval_competencies_weighted">smarteval_competencies_weighted
+  </a></li>
+  <li><a href="#smarteval_topic_evaluations">smarteval_topic_evaluations
+  </a></li>
+  <li><a
+    href="#smarteval_competency_evaluations">smarteval_competency_evaluations
+    </a></li>
+  <li><a
+    href="#smarteval_topic_evaluations_numeric">smarteval_topic_evaluations_numeric
+    </a></li>
+  <li><a
+    href="#smarteval_competency_evaluations_numeric">smarteval_competency_evaluations_numeric
+    </a></li>
+  <li><a
+    href="#smarteval_topic_evaluations_boolean">smarteval_topic_evaluations_boolean
+    </a></li>
+  <li><a
+    href="#smarteval_competency_evaluations_boolean">smarteval_competency_evaluations_boolean
+    </a></li>
+  <li><a
+    href="#smarteval_personal_competencies">smarteval_personal_competencies
+  </a></li>
+  <li><a href="#tm_license_orders">tm_license_orders </a></li>
+  <li><a href="#tm_deprecated_mobile_version">tm_deprecated_mobile_version
+  </a></li>
+  <li><a href="#tm_mobile_version_control">tm_mobile_version_control </a></li>
+  <li><a
+    href="#tm_users_application_properties">tm_users_application_properties
+  </a></li>
+  <li><a href="#tm_event_sources_location">tm_event_sources_location</a></li>
+  <li><a
+  href="#tm_event_email_subscriptions">tm_event_email_subscriptions</a></li>
+</ul>
+
+<p></p>
+<pre><a name="tm_images" id="tm_images">CREATE TABLE tm_images (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+imageCode VARCHAR(20) NULL DEFAULT NULL,
+name VARCHAR(100) NOT NULL,  
+content LONGBLOB NOT NULL,
+UNIQUE INDEX UK_images_01 (imageCode)
+);
+
+<a name="tm_languages" id="tm_languages">CREATE TABLE tm_languages (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+code VARCHAR(5) NOT NULL,  
+name VARCHAR(100) NOT NULL,
+    CONSTRAINT ukLangCode UNIQUE KEY (code),
+    CONSTRAINT ukLangName UNIQUE KEY (name)
+);
+
+<a name="tm_languages_lang" id="tm_languages_lang">CREATE TABLE tm_languages_lang (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+nameShowed VARCHAR(100) NOT NULL,
+    languageIdParent BIGINT NOT NULL,
+languageId BIGINT NOT NULL,
+CONSTRAINT fklanguageLangLang FOREIGN KEY (languageId) REFERENCES tm_languages (id),
+    CONSTRAINT fklanguageParentLangLang FOREIGN KEY (languageIdParent) REFERENCES tm_languages (id),
+    CONSTRAINT uklanguageLang UNIQUE KEY  (languageIdParent,languageId)
+);
+
+<a name="tm_countries" id="tm_countries">CREATE TABLE tm_countries (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+countryCode VARCHAR(2) NOT NULL, 
+country VARCHAR(200) NOT NULL, 
+currencyCode VARCHAR(10), 
+currencyName VARCHAR(100), 
+phone VARCHAR(10),
+CONSTRAINT ukCountryCode UNIQUE KEY (countryCode),
+    CONSTRAINT ukCountryName UNIQUE KEY (country)
+);
+
+<a name="tm_organizations" id="tm_organizations">CREATE TABLE tm_organizations (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+name VARCHAR(200) NOT NULL, 
+subscriptionDate DATE, 
+tin VARCHAR(1000), 
+address VARCHAR(2000) NOT NULL, 
+city VARCHAR(200) NOT NULL, 
+countryId BIGINT NOT NULL, 
+languageId BIGINT NOT NULL, 
+enabled INT NOT NULL DEFAULT 0, 
+login INT NOT NULL DEFAULT 0,
+domain VARCHAR(100) NOT NULL,
+smuUserId BIGINT,
+    isPrivateModeEnabled INT NOT NULL DEFAULT 0,
+    webOn INT NOT NULL DEFAULT 1,
+    webOffMessageOn INT NOT NULL DEFAULT 0,
+    activateUserOn INT NOT NULL DEFAULT 1,
+    eulaEnabled INT NOT NULL DEFAULT 0,
+    textEula LONGBLOB,
+    internalType INT NOT NULL DEFAULT 0,
+    licensePaymentPending BIT NOT NULL DEFAULT false,
+    amountOfLicenses INT NULL,
+CONSTRAINT fkOrgCountry FOREIGN KEY (countryId) REFERENCES tm_countries (id), 
+CONSTRAINT fkOrgLang FOREIGN KEY (languageId) REFERENCES tm_languages (id),
+CONSTRAINT ukOrgName UNIQUE KEY (name),
+CONSTRAINT ukOrgDomain UNIQUE KEY (domain)
+);
+
+<a name="tm_organization_files" id="tm_organization_files">CREATE TABLE tm_organization_files(</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+    organizationId BIGINT NOT NULL, 
+    type INT(11),
+    content LONGBLOB,
+    CONSTRAINT fkOrgFileOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id)
+);
+
+<a name="tm_modules" id="tm_modules">CREATE TABLE tm_modules (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+name VARCHAR(200) NOT NULL, 
+enabled INT NOT NULL,
+    CONSTRAINT ukModuleName UNIQUE (name)
+);
+
+<a name="tm_organization_modules" id="tm_organization_modules">CREATE TABLE tm_organization_modules (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+organizationId BIGINT NOT NULL, 
+moduleId BIGINT NOT NULl, 
+enabled INT NOT NULL, 
+CONSTRAINT fkOrgModOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id), 
+CONSTRAINT fkOrgModMod FOREIGN KEY (moduleId) REFERENCES tm_modules (id),
+CONSTRAINT ukOrgModule UNIQUE (organizationId,moduleId)
+);
+
+<a name="tm_organization_offices" id="tm_organization_offices">CREATE TABLE tm_organization_offices (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+organizationId BIGINT NOT NULL, 
+name VARCHAR(200) NOT NULL,
+enabled INT NOT NULL, 
+CONSTRAINT fkOrgOff FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+CONSTRAINT ukOrgOffice UNIQUE KEY (organizationId,name)
+);
+
+<a name="tm_users" id="tm_users">CREATE TABLE tm_users (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+organizationId BIGINT NOT NULL, 
+firstName VARCHAR(100) NOT NULL, 
+middleName VARCHAR(100), 
+lastName VARCHAR(100) NOT NULL,  
+email VARCHAR(200) NOT NULL,
+nickname VARCHAR(100),
+phoneNumber VARCHAR(100), 
+languageId BIGINT NOT NULL, 
+countryId BIGINT, 
+password VARCHAR(1000), 
+officeId BIGINT,
+job VARCHAR(1000), 
+seniority VARCHAR(50), 
+profileImageId BIGINT NOT NULL DEFAULT 0, 
+profileImageCode VARCHAR(20) NULL DEFAULT NULL,
+cv TEXT,
+enabled INT NOT NULL,
+organizationalUnit VARCHAR(2000),
+    area VARCHAR(4000),
+    account VARCHAR(4000),
+    project VARCHAR(4000),
+minTokenTime BIGINT NOT NULL DEFAULT 0,
+birthDate DATETIME NULL,
+orgEntryDate DATETIME NULL,
+    tosRead INT NOT NULL DEFAULT 0,
+    tosDateRead DATETIME,
+    customerMode INT NOT NULL DEFAULT 0,
+    giveStarTimestamp BIGINT NOT NULL DEFAULT 0,
+    giveStarTransactionId BIGINT NOT NULL DEFAULT 0,
+CONSTRAINT fkOrgUserOrgOff FOREIGN KEY (officeId) REFERENCES tm_organization_offices (id),
+CONSTRAINT fkOrgUserOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+CONSTRAINT fkOrgUserCountry FOREIGN KEY (countryId) REFERENCES tm_countries (id), 
+CONSTRAINT fkOrguserLang FOREIGN KEY (languageId) REFERENCES tm_languages (id),
+CONSTRAINT ukUserEmail UNIQUE KEY (organizationId,email)
+);
+
+ALTER TABLE tm_organizations ADD CONSTRAINT fkOrgSmuUser FOREIGN KEY (smuUserId) REFERENCES tm_users (id);
+
+<a name="tm_users_preferences" id="tm_users_preferences">CREATE TABLE tm_users_preferences (</a>
+id BIGINT AUTO_INCREMENT,
+userId BIGINT NOT NULL,
+emailAccount VARCHAR(100),
+facebookAccount VARCHAR(100),
+googlePlusAccount VARCHAR(100),
+twitterToken VARCHAR(100),
+twitterTokenSecret VARCHAR(100),
+linkedInAccount VARCHAR(200),
+    allPushNotifications  INT NOT NULL,
+    pushNotificationsToLikes  INT NOT NULL,
+    pushNotificationsToComments  INT NOT NULL,
+CONSTRAINT ukPrefUser UNIQUE KEY (userId),
+CONSTRAINT fkUsrPrefUsr FOREIGN KEY (userId) REFERENCES tm_users (id),
+PRIMARY KEY(id)
+);
+
+<a name="tm_translations" id="tm_translations">CREATE TABLE tm_translations (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+accessKey VARCHAR(200) NOT NULL, 
+languageCode VARCHAR(20) NOT NULL, 
+value VARCHAR(4000) NOT NULL
+);
+
+ALTER TABLE tm_translations ADD UNIQUE unique_index(accessKey, languageCode);
+
+<a name="smu_organization_values" id="smu_organization_values">CREATE TABLE smu_organization_values (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+organizationId BIGINT NOT NULL, 
+parentId BIGINT,
+name VARCHAR(200) NOT NULL,
+description VARCHAR(4000) DEFAULT NULL, 
+enabled INT NOT NULL,
+imageId BIGINT NOT NULL DEFAULT 0,
+    imageCode VARCHAR(20) NULL,
+isTalent BIGINT NOT NULL DEFAULT 0,
+    backgroundColor VARCHAR(100),
+CONSTRAINT fkOrgValOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+    CONSTRAINT fkParentId FOREIGN KEY (parentId) REFERENCES smu_organization_values (id)
+);
+
+<a name="smu_organization_values_lang" id="smu_organization_values_lang">CREATE TABLE smu_organization_values_lang (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+valueId BIGINT NOT NULL,
+nameShowed VARCHAR(200) NOT NULL,
+descriptionShowed VARCHAR(4000) NOT NULL,
+languageId BIGINT NOT NULL,
+CONSTRAINT fkOrgValLangLang FOREIGN KEY (languageId) REFERENCES tm_languages (id),
+CONSTRAINT fkOrgValLangVal FOREIGN KEY (valueId) REFERENCES smu_organization_values (id),
+CONSTRAINT ukOrgValueLang UNIQUE KEY  (valueId,languageId)
+);
+
+<a name="smu_stars" id="smu_stars">CREATE TABLE smu_stars (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+fromId BIGINT NOT NULL,
+toId BIGINT NOT NULL,
+dateStar TIMESTAMP NOT NULL, 
+valueId BIGINT NOT NULL, 
+notes VARCHAR(4000), 
+lastUpdate TIMESTAMP NOT NULL,
+    enabled INT NOT NULL DEFAULT 1,
+    typeStar VARCHAR(1) NOT NULL DEFAULT 'C',
+CONSTRAINT fkStarsValues FOREIGN KEY (valueId) REFERENCES smu_organization_values (id),
+CONSTRAINT fkStarsFromEmp FOREIGN KEY (fromId) REFERENCES tm_users (id),
+CONSTRAINT fkStarsToEmpl FOREIGN KEY (toId) REFERENCES tm_users (id)
+);
+
+<a name="smu_comments" id="smu_comments">CREATE TABLE smu_comments (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT NOT NULL,
+    dateComment TIMESTAMP NOT NULL,
+    typeComment VARCHAR(30) NOT NULL,
+    comments VARCHAR(400),
+    idStarRelated BIGINT,
+    idCommentRelated BIGINT,
+    imageId BIGINT(20) NULL,
+    enabled INT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_comments_01 FOREIGN KEY (imageId) REFERENCES tm_images (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fkCommentsStars FOREIGN KEY (idStarRelated) REFERENCES smu_stars (id),
+    CONSTRAINT fkCommentsUsers FOREIGN KEY (userId) REFERENCES tm_users (id),
+    CONSTRAINT fkCommentToComment FOREIGN KEY (idCommentRelated) REFERENCES smu_comments (id)
+);
+
+<a name="smu_organization_properties" id="smu_organization_properties">CREATE TABLE smu_organization_properties (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+organizationId BIGINT NOT NULL, 
+property VARCHAR(100) NOT NULL,
+propertyValue VARCHAR(2000) NOT NULL,
+enabled INT NOT NULL,
+CONSTRAINT fkorgProOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+CONSTRAINT ukOrgProperty UNIQUE KEY (organizationId,property)
+);
+
+<a name="smu_stars_periods" id="smu_stars_periods">CREATE TABLE smu_stars_periods (</a>
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    organizationId BIGINT NOT NULL,
+    maxStarToGive BIGINT NOT NULL,
+    startDatePeriod TIMESTAMP NOT NULL,
+    periodValue BIGINT NOT NULL,
+    periodUnit VARCHAR(10) NOT NULL,
+    CONSTRAINT fkStarPeriodOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+    CONSTRAINT ckMaxStartGraterZero CHECK (maxStarToGive &gt; 0),
+    CONSTRAINT ckPeriodValue CHECK (periodValue &gt; 0)
+);
+
+<a name="tm_roles" id="tm_roles">CREATE TABLE tm_roles (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+role VARCHAR(100) NOT NULL UNIQUE,
+roleDescription VARCHAR(2000) NOT NULL,
+ CONSTRAINT ukRole UNIQUE KEY (role)
+);
+
+<a name="tm_users_roles" id="tm_users_roles">CREATE TABLE tm_users_roles (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT,
+roleId BIGINT,
+dateAssigned TIMESTAMP NOT NULL,
+enabled INT NOT NULL,
+CONSTRAINT fkUserOrgUser FOREIGN KEY (userId) REFERENCES tm_users (id),
+CONSTRAINT fkUserRoleToRole FOREIGN KEY (roleId) REFERENCES tm_roles (id),
+CONSTRAINT ukUserRole UNIQUE KEY (userId,roleId)
+);
+
+<a name="smu_notifications" id="smu_notifications">CREATE TABLE smu_notifications (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT NOT NULL,
+    title varchar(100) NOT NULL,
+    notification VARCHAR(4000) NOT NULL,
+    dateNotification TIMESTAMP NOT NULL,
+    fromId BIGINT NOT NULL,
+    isRead INT NOT NULL,
+idStarRelated BIGINT,
+    isDeleted INT NOT NULL DEFAULT 0,
+    isView INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkNotificationStars FOREIGN KEY (idStarRelated) REFERENCES smu_stars (id),
+    CONSTRAINT fkNotificationUsers FOREIGN KEY (userId) REFERENCES tm_users (id),
+    CONSTRAINT fkNotificationFromUser FOREIGN KEY (fromId) REFERENCES tm_users (id)
+);
+
+<a name="tm_groups" id="tm_groups">CREATE TABLE tm_groups (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(4000) NOT NULL,
+    organizationId BIGINT NOT NULL,
+    enabled INT NOT NULL,
+    CONSTRAINT fkGroupsOrganization FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+    CONSTRAINT ukGroupName UNIQUE (name)
+);
+
+<a name="tm_users_groups" id="tm_users_groups">CREATE TABLE tm_users_groups (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    userId BIGINT NOT NULL,
+    groupId BIGINT NOT NULL,
+    enabled INT NOT NULL,
+    CONSTRAINT fkUserGroupsUsers FOREIGN KEY (userId) REFERENCES tm_users (id),
+    CONSTRAINT fkUserGroupsGroups FOREIGN KEY (groupId) REFERENCES tm_groups (id),
+    CONSTRAINT ukUserGroupUNIQUE (userId, groupId)
+);
+
+
+<a name="tm_tasks" id="tm_tasks">CREATE TABLE tm_tasks (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+    type VARCHAR(100) NOT NULL,
+    params VARCHAR(4000) NOT NULL,
+    taskClass VARCHAR(1000) NOT NULL,
+    organizationId BIGINT NOT NULL,
+    locked INT NOT NULL DEFAULT 0,
+    executionDate TIMESTAMP NOT NULL,
+    creationDate TIMESTAMP NOT NULL,
+    CONSTRAINT fKTasksOrganization FOREIGN KEY (organizationId) REFERENCES tm_organizations (id)
+);
+
+<a name="tm_users_devices" id="tm_users_devices">CREATE TABLE tm_users_devices (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT,
+deviceId VARCHAR(1000) NOT NULL,
+endPoint VARCHAR(1000) NOT NULL,
+    uniqueId VARCHAR(100) NOT NULL,
+    platform VARCHAR(50) NOT NULL,
+    appId VARCHAR(30),
+CONSTRAINT fkUserDevicesUser FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+
+<a name="tm_access_logs" id="tm_access_logs">CREATE TABLE tm_access_logs (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT NOT NULL,
+origin VARCHAR(100) NULL,
+    version VARCHAR(100) NULL,
+date TIMESTAMP NOT NULL,
+login INT NOT NULL DEFAULT 0,
+CONSTRAINT fkUserAccessLog FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+<a name="tm_given_star_logs" id="tm_given_star_logs">CREATE TABLE tm_given_star_logs (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT NOT NULL,
+    starId BIGINT NOT NULL,
+origin VARCHAR(100) NULL,
+    version VARCHAR(100) NULL,
+date TIMESTAMP NOT NULL,
+CONSTRAINT fkUserGivenStarLog FOREIGN KEY (userId) REFERENCES tm_users (id),
+    CONSTRAINT fkStarGivenStarLog FOREIGN KEY (starId) REFERENCES smu_stars (id)
+);
+
+<a name="tm_external_skills" id="tm_external_skills">CREATE TABLE tm_external_skills (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+userId BIGINT NOT NULL,
+starId BIGINT NULL,
+externalId VARCHAR(100) NOT NULL,
+externalName VARCHAR(100) NULL,
+origin INT NOT NULL,
+CONSTRAINT FK_external_skills_01 FOREIGN KEY (starId) REFERENCES smu_stars (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fkExtSkillUsr FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+<a name="tm_skills" id="tm_skills">CREATE TABLE tm_skills (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+userId BIGINT NOT NULL,
+talentId BIGINT NOT NULL,
+talentExternalId BIGINT NULL,
+enabled INT NOT NULL DEFAULT 0,
+CONSTRAINT FK_skills_01 FOREIGN KEY (talentId) REFERENCES smu_organization_values (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
+    CONSTRAINT fkSkillUsr FOREIGN KEY (userId) REFERENCES tm_users (id),
+    CONSTRAINT fkSkillExt FOREIGN KEY (talentExternalId) REFERENCES tm_external_skills (id)
+);
+
+<a name="tm_users_files" id="tm_users_files">CREATE TABLE tm_users_files (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+name VARCHAR(100) NOT NULL,  
+content LONGBLOB NOT NULL,
+organizationId BIGINT NOT NULL,
+creationDate TIMESTAMP NOT NULL,
+statusDate TIMESTAMP NOT NULL,
+status VARCHAR(100) NOT NULL,  
+userUploadSummary VARCHAR(1000) NOT NULL,  
+userId BIGINT,
+recordsRejected LONGTEXT NULL DEFAULT NULL,
+recordsDetail LONGTEXT NULL DEFAULT NULL,
+    CONSTRAINT fkFileOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id),
+CONSTRAINT fkFileUser FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+<a name="tm_oauth_tokens" id="tm_oauth_tokens">CREATE TABLE tm_oauth_tokens (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT,
+smuToken VARCHAR(1000) NOT NULL,
+accessToken VARCHAR(1000) NOT NULL,
+refreshToken VARCHAR(1000) NOT NULL,
+    validationDate TIMESTAMP NOT NULL,
+    CONSTRAINT fkoAuthTokenUser FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+<a name="tm_price_list" id="tm_price_list">CREATE TABLE tm_price_list (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+name VARCHAR(100) NOT NULL,
+    price DOUBLE,
+    size INT UNSIGNED,
+    description VARCHAR(1000) NOT NULL,
+    buyFlag TINYINT UNSIGNED NOT NULL,
+    imageId BIGINT UNSIGNED,
+    enabled TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    CONSTRAINT ukPriceName UNIQUE KEY (name)
+);
+
+<a name="am_achievements" id="am_achievements">CREATE TABLE am_achievements (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+organizationId BIGINT NOT NULL,
+name VARCHAR(100) NULL,
+description VARCHAR(200) NULL,
+achievedImageId BIGINT NOT NULL DEFAULT 0,
+    achieveImageCode VARCHAR(20) NULL,
+    notAchievedImageId BIGINT NOT NULL DEFAULT 0,
+    notAchieveImageCode VARCHAR(20) NULL,
+backgroundColor VARCHAR(50) NULL,
+enabled INT NOT NULL DEFAULT 0,
+    orderList INT NOT NULL DEFAULT 500,
+    isRetroactive INT NOT NULL DEFAULT 1,
+    startDate DATE,
+CONSTRAINT fkAchievementOrganization FOREIGN KEY (organizationId) REFERENCES tm_organizations (id)
+);
+
+<a name="am_entities" id="am_entities">CREATE TABLE am_entities (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+value VARCHAR(100) NOT NULL
+);
+
+INSERT INTO am_entities (id, name, value) values (1,'Star','com.globant.talent.data.model.StarMeUpStar');
+INSERT INTO am_entities (id, name, value) values (2,'Comment','com.globant.talent.data.model.StarMeUpComment');
+INSERT INTO am_entities (id, name, value) values (3,'User','com.globant.talent.data.model.User');
+
+<a name="am_entity_properties" id="am_entity_properties">CREATE TABLE am_entity_properties (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+entityId BIGINT NOT NULL,
+name VARCHAR(100) NOT NULL,
+value VARCHAR(100) NOT NULL,
+type VARCHAR(100) NOT NULL,
+CONSTRAINT fkEntityPropertyEntity FOREIGN KEY (entityId) REFERENCES am_entities (id)
+);
+
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (1,1,'Identifier','id','java.lang.Long');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (2,1,'Enabled','enabled','java.lang.Boolean');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (3,1,'Sender','from','com.globant.talent.data.model.User');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (4,1,'Receiver','to','com.globant.talent.data.model.User');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (5,1,'Star Type','typeStar','java.lang.String');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (6,1,'Organization Value','starMeUpOrganizationStar','com.globant.talent.data.model.StarMeUpStar');
+insert into am_entity_properties (id, entityId, name, value, type) values (14,1, 'Date star', 'date', 'java.util.Date');
+
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (7,2,'Identifier','id','java.lang.Long');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (8,2,'Enabled','enabled','java.lang.Boolean');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (9,2,'Comment Type','type','java.lang.String');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (12,2,'User','user','com.globant.talent.data.model.User');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (13,2,'Star related','starId','java.lang.Long');
+insert into am_entity_properties (id, entityId, name, value, type) values (15,2, 'Date comment', 'dateComment', 'java.util.Date');
+
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (10,3,'Identifier','id','java.lang.Long');
+INSERT INTO am_entity_properties (id, entityId, name, value, type) values (11,3,'Identifier','profileImageId','java.lang.Long');
+
+
+<a name="am_comparators" id="am_comparators">CREATE TABLE am_comparators (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+value VARCHAR(100) NOT NULL
+);
+
+INSERT INTO am_comparators (id, name, value) values (1,'Equal','=');
+INSERT INTO am_comparators (id, name, value) values (2,'Less than','<');
+INSERT INTO am_comparators (id, name, value) values (3,'Less than or Equal','><=');
+INSERT INTO am_comparators (id, name, value) values (4,'Greater than','>&lt;');
+INSERT INTO am_comparators (id, name, value) values (5,'Greater than or Equal','&gt;=');
+INSERT INTO am_comparators (id, name, value) values (6,'Into','in');
+INSERT INTO am_comparators (id, name, value) values (7,'Not Into','not_in');
+INSERT INTO am_comparators (id, name, value) values (8,'None','none');
+INSERT INTO am_comparators (id, name, value) values (9,'Not Equal','not_equal');
+INSERT INTO am_comparators (id, name, value) values (10,'Exists','exists');
+INSERT INTO am_comparators (id, name, value) values (11,'Not Exists','not_exists');
+
+<a name="am_functions" id="am_functions">CREATE TABLE am_functions (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+value VARCHAR(100) NOT NULL
+);
+
+INSERT INTO am_functions (id, name, value) values (1,'Count','count');
+INSERT INTO am_functions (id, name, value) values (2,'Count Distinct','count_distinct');
+INSERT INTO am_functions (id, name, value) values (3,'Select','select');
+INSERT INTO am_functions (id, name, value) values (4,'Min','min');
+INSERT INTO am_functions (id, name, value) values (5,'Max','max');
+
+<a name="am_criteria" id="am_criteria">CREATE TABLE am_criteria (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+achievementId BIGINT NOT NULL,
+description VARCHAR(200) NOT NULL,
+entityId BIGINT NOT NULL,
+functionForMainConditionId BIGINT NOT NULL,
+entityPropertyForMainConditionId BIGINT NOT NULL,
+comparatorForMainConditionId BIGINT NOT NULL,
+valueForMainCondition VARCHAR(100) NULL,
+isSubCriteria INT NOT NULL DEFAULT 0,
+    entityPropertyForGroupBy BIGINT,
+    entityAlias VARCHAR(20),
+CONSTRAINT fkCriteriaAchievement FOREIGN KEY (achievementId) REFERENCES am_achievements (id),
+CONSTRAINT fkCriteriaEntity FOREIGN KEY (entityId) REFERENCES am_entities (id),
+CONSTRAINT fkCriteriaFunction FOREIGN KEY (functionForMainConditionId) REFERENCES am_functions (id),
+CONSTRAINT fkCriteriaEntityProperty FOREIGN KEY (entityPropertyForMainConditionId) REFERENCES am_entity_properties (id),
+    CONSTRAINT fkGroupByEntityProperty FOREIGN KEY (entityPropertyForGroupBy) REFERENCES am_entity_properties (id),
+CONSTRAINT fkCriteriaComparator FOREIGN KEY (comparatorForMainConditionId) REFERENCES am_comparators (id)
+);
+
+<a name="am_conditions" id="am_conditions">CREATE TABLE am_conditions (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+criteriaId BIGINT NOT NULL,
+prefixOperator VARCHAR(50) NOT NULL DEFAULT 'and',
+entityPropertyId BIGINT NOT NULL,
+comparatorId BIGINT NOT NULL,
+value VARCHAR(100) NOT NULL,
+subCriteriaId BIGINT NULL,
+    correlated BIGINT NOT NULL DEFAULT 0,
+    parentEntityPropertyId BIGINT,
+CONSTRAINT fkConditionCriteria FOREIGN KEY (criteriaId) REFERENCES am_criteria (id),
+CONSTRAINT fkConditionEntityProperty FOREIGN KEY (entityPropertyId) REFERENCES am_entity_properties (id),
+    CONSTRAINT fkConditionPaerntEntityProperty FOREIGN KEY (parentEntityPropertyId) REFERENCES am_entity_properties (id),
+CONSTRAINT fkConditionComparator FOREIGN KEY (comparatorId) REFERENCES am_comparators (id),
+CONSTRAINT fkConditionSubCriteria FOREIGN KEY (subCriteriaId) REFERENCES am_criteria (id)
+);
+
+<a name="am_criteria_fulfilled" id="am_criteria_fulfilled">CREATE TABLE am_criteria_fulfilled (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+criteriaId BIGINT NOT NULL,
+userId BIGINT NOT NULL,
+complianceDate TIMESTAMP NOT NULL,
+    CONSTRAINT fkCriteriaFulfilledCriteria FOREIGN KEY (criteriaId) REFERENCES am_criteria (id),
+    CONSTRAINT fkCriteriaFulfilledUser FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+<a name="am_badges" id="am_badges">CREATE TABLE am_badges (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+achievementId BIGINT NOT NULL,
+userId BIGINT NOT NULL,
+grantDate TIMESTAMP NOT NULL,
+    notified INT NOT NULL DEFAULT 0,
+    percentage DOUBLE NOT NULL DEFAULT 0,
+    completed INT NOT NULL DEFAULT 0,
+    emailSent INT NOT NULL DEFAULT 0,
+CONSTRAINT fkBadgeAchievement FOREIGN KEY (achievementId) REFERENCES am_achievements (id),
+CONSTRAINT fkBadgeUser FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+<a name="smarteval_org_chart" id="smarteval_org_chart">CREATE TABLE smarteval_org_chart (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT, 
+userId BIGINT NOT NULL, 
+managerId BIGINT NOT NULL, 
+percentage INT NOT NULL DEFAULT 0, 
+enabled INT NOT NULL DEFAULT 0, 
+CONSTRAINT fkOrgChartUser FOREIGN KEY (userId) REFERENCES tm_users (id),
+CONSTRAINT fkOrgChartManager FOREIGN KEY (managerId) REFERENCES tm_users (id)
+);
+
+<a name="smarteval_evaluations" id="smarteval_evaluations">CREATE TABLE smarteval_evaluations (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT NOT NULL,
+    managerId BIGINT NOT NULL,
+    comments VARCHAR(400),
+    evaluatorType VARCHAR(30),
+CONSTRAINT fkEvalUser FOREIGN KEY (userId) REFERENCES tm_users (id),
+    CONSTRAINT fkEvalManager FOREIGN KEY (managerId) REFERENCES tm_users (id)
+);
+
+<a name="smarteval_evaluations_matrix" id="smarteval_evaluations_matrix">CREATE TABLE smarteval_evaluations_matrix (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+fromDate TIMESTAMP NOT NULL,
+toDate TIMESTAMP NOT NULL,
+    CONSTRAINT fkMatrixEvalEval FOREIGN KEY (id) REFERENCES smarteval_evaluations (id)
+);
+
+<a name="smarteval_evaluations_quick" id="smarteval_evaluations_quick">CREATE TABLE smarteval_evaluations_quick (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    evaluationDate TIMESTAMP NOT NULL,
+score INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkQuickEvalEval FOREIGN KEY (id) REFERENCES smarteval_evaluations (id)
+);
+
+<a name="smarteval_topics" id="smarteval_topics">CREATE TABLE smarteval_topics (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+enabled INT NOT NULL DEFAULT 0, 
+organizationId BIGINT NOT NULL,
+imageId BIGINT NOT NULL DEFAULT 0,
+    backgroundColor VARCHAR(100),
+    orderNumber INT NOT NULL DEFAULT 0, 
+    evaluationType VARCHAR(30) NOT NULL,
+    description VARCHAR(1000),
+    type VARCHAR(30), 
+CONSTRAINT fkTopicOrg FOREIGN KEY (organizationId) REFERENCES tm_organizations (id)
+);
+
+<a name="smarteval_topic_per_seniority_job" id="smarteval_topic_per_seniority_job">CREATE TABLE smarteval_topic_per_seniority_job (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+job VARCHAR(1000), 
+seniority VARCHAR(50), 
+enabled INT NOT NULL DEFAULT 0, 
+topicId BIGINT NOT NULL,
+    CONSTRAINT fkTopicPerSeniorityJobTopic FOREIGN KEY (topicId) REFERENCES smarteval_topics (id)
+);
+
+<a name="smarteval_competencies" id="smarteval_competencies">CREATE TABLE smarteval_competencies (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(100) NOT NULL,
+enabled INT NOT NULL DEFAULT 0, 
+topicId BIGINT NOT NULL,
+    orderNumber INT NOT NULL DEFAULT 0, 
+    type VARCHAR(30),
+CONSTRAINT fkCompetencyTopic FOREIGN KEY (topicId) REFERENCES smarteval_topics (id)
+);
+
+<a name="smarteval_competencies_weighted" id="smarteval_competencies_weighted">CREATE TABLE smarteval_competencies_weighted (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+weight FLOAT NOT NULL,
+    CONSTRAINT fkCompetencyWeightedCompetency FOREIGN KEY (id) REFERENCES smarteval_competencies (id)
+);
+
+<a name="smarteval_topic_evaluations" id="smarteval_topic_evaluations">CREATE TABLE smarteval_topic_evaluations (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+evaluationId BIGINT NOT NULL,
+topicId BIGINT NOT NULL,
+    comments VARCHAR(400),
+    lastUpdate TIMESTAMP NOT NULL,
+    CONSTRAINT fkTopicEvalEvaluation FOREIGN KEY (evaluationId) REFERENCES smarteval_evaluations (id),
+CONSTRAINT fkTopicEvalTopic FOREIGN KEY (topicId) REFERENCES smarteval_topics (id)
+);
+
+<a name="smarteval_competency_evaluations" id="smarteval_competency_evaluations">CREATE TABLE smarteval_competency_evaluations (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+evaluationDate TIMESTAMP NOT NULL,
+enabled INT NOT NULL DEFAULT 0, 
+competencyId BIGINT NOT NULL,
+topicEvaluationId BIGINT NOT NULL,
+CONSTRAINT fkCompetencyEvalCompetency FOREIGN KEY (competencyId) REFERENCES smarteval_competencies (id),
+CONSTRAINT fkCompetencyEvalTopicEval FOREIGN KEY (topicEvaluationId) REFERENCES smarteval_topic_evaluations (id)
+);
+
+<a name="smarteval_topic_evaluations_numeric" id="smarteval_topic_evaluations_numeric">CREATE TABLE smarteval_topic_evaluations_numeric (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+average FLOAT NOT NULL,
+    maxScore INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkTopicEvalNumericTopicEval FOREIGN KEY (id) REFERENCES smarteval_topic_evaluations (id)
+);
+
+<a name="smarteval_competency_evaluations_numeric" id="smarteval_competency_evaluations_numeric">CREATE TABLE smarteval_competency_evaluations_numeric (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+score INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkCompetencyEvalNumericCompetencyEval FOREIGN KEY (id) REFERENCES smarteval_competency_evaluations (id)
+);
+
+<a name="smarteval_topic_evaluations_boolean" id="smarteval_topic_evaluations_boolean">CREATE TABLE smarteval_topic_evaluations_boolean (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+quantityInTrue INT NOT NULL DEFAULT 0,
+    quantityInFalse INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkTopicEvalBooleanTopicEval FOREIGN KEY (id) REFERENCES smarteval_topic_evaluations (id)
+);
+
+<a name="smarteval_competency_evaluations_boolean" id="smarteval_competency_evaluations_boolean">CREATE TABLE smarteval_competency_evaluations_boolean (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+score INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkCompetencyEvalBooleanCompetencyEval FOREIGN KEY (id) REFERENCES smarteval_competency_evaluations (id)
+);
+
+<a name="smarteval_personal_competencies" id="smarteval_personal_competencies">CREATE TABLE smarteval_personal_competencies (</a>
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT NOT NULL,
+competencyId BIGINT NOT NULL,
+creatorId BIGINT NOT NULL,
+creationDate TIMESTAMP,
+    enabled INT NOT NULL DEFAULT 0,
+    CONSTRAINT fkPersonalCompetencyUser FOREIGN KEY (userId) REFERENCES tm_users (id),
+CONSTRAINT fkPersonalCompetencyCompetency FOREIGN KEY (competencyId) REFERENCES smarteval_competencies (id),
+CONSTRAINT fkPersonalCompetencyCreator FOREIGN KEY (creatorId) REFERENCES tm_users (id)
+);
+
+<a name="tm_license_orders" id="tm_license_orders">CREATE TABLE tm_license_orders (</a>
+id BIGINT(20) NOT NULL AUTO_INCREMENT,
+priceListId BIGINT(20) NOT NULL,
+userId BIGINT(20) NOT NULL,
+orderDate TIMESTAMP NOT NULL,
+amountLicenses INT(11) NOT NULL,
+totalPrice DECIMAL(10,2) NOT NULL,
+licenseExpirationDate TIMESTAMP NULL DEFAULT NULL,
+organizationId BIGINT(20) NULL DEFAULT NULL,
+orderStatus INT(11) NOT NULL,
+confirmationDate TIMESTAMP NULL DEFAULT NULL,
+confirmationResponse LONGTEXT NULL,
+PRIMARY KEY (id),
+INDEX fk_tm_license_orders_01 (priceListId),
+INDEX fk_tm_license_orders_02 (userId),
+INDEX fk_tm_license_orders_03 (organizationId),
+CONSTRAINT fk_tm_license_orders_01 FOREIGN KEY (priceListId) REFERENCES tm_price_list (id),
+CONSTRAINT fk_tm_license_orders_02 FOREIGN KEY (userId) REFERENCES tm_users (id),
+CONSTRAINT fk_tm_license_orders_03 FOREIGN KEY (organizationId) REFERENCES tm_organizations (id)
+);
+
+insert into tm_modules (id, name, enabled) values (1,'TM_CORE',1);
+insert into tm_modules (id, name, enabled) values (2,'TM_STELLAR',1);
+insert into tm_modules (id, name, enabled) values (3,'TM_TALENT',1);
+insert into tm_modules (id, name, enabled) values (4,'TM_CUSTOMER', 1);
+insert into tm_modules (id, name, enabled) values (5,'TM_ACHIEVEMENTS', 1);
+
+insert into tm_languages (id, code, name) values (1,'en','English');
+insert into tm_languages (id, code, name) values (2,'es','Spanish');
+/*insert into tm_languages (id, code, name) values (3,'en-US','English - United States');
+insert into tm_languages (id, code, name) values (4,'es-AR','Spanish - Argentine');*/
+
+insert into tm_languages_lang  (nameShowed,languageIdParent,languageId) values ('Inglés',1,2);
+insert into tm_languages_lang  (nameShowed,languageIdParent,languageId) values ('Español',2,2);
+
+insert into tm_countries (id, countryCode, country, currencyCode, currencyName,phone) values (1,'US', 'United States', 'U$S', 'Dollar','01');
+insert into tm_countries (id, countryCode, country, currencyCode, currencyName,phone) values (2,'AR', 'Argentine', '$', 'Pesos','54');
+
+SET FOREIGN_KEY_CHECKS=0;
+insert into tm_organizations (id, name, address, city, countryId, languageId, enabled, login, domain, smuUserId) values (1,'StarMeUp','Address','City',1,1,1,0,'starmeup',1);
+insert into tm_users (id,organizationId,firstName,lastName,email,nickname,languageId,countryId,password,enabled,seniority,phoneNumber,job,officeId) values (1,1,'Starmeup','User','starmeup@starmeup.com','Starmeup',1,NULL,'',0,NULL,NULL,NULL,NULL);
+SET FOREIGN_KEY_CHECKS=1;
+
+insert into tm_organization_modules(id, organizationId, moduleId, enabled) values (1, 1, 1,1);
+insert into tm_organization_modules(id, organizationId, moduleId, enabled) values (2, 1, 2,1);
+insert into tm_organization_modules(id, organizationId, moduleId, enabled) values (3, 1, 3,0);
+
+insert into tm_organization_offices (id, organizationId, name,enabled) values (1,1,'Globant Cordoba',1);
+insert into tm_organization_offices (id, organizationId, name,enabled) values (2,1,'Globant Chaco',1);
+
+insert into tm_users (id,organizationId,firstName,lastName,email,nickname,languageId,countryId,password,enabled,seniority,phoneNumber,job,officeId) values (2,1,'Admin','StarMeUp','admin@starmeup.com','Admin',1,1,'1000:71387fb01187dad79b414d1c76a58e94459af3c57f61bda7:86e6c9456600c8812b084a79f2401a54a6dc4b07ea766359',1,'Senior Dev','555-5555','Developer',1);
+
+insert into tm_roles (id,role,roleDescription) values (1,'SUPERADMIN','Allow to do anything in the application');
+insert into tm_roles (id,role,roleDescription) values (2,'ORGANIZATION_ADMIN','Allow to do anything for an organization');
+insert into tm_roles (id,role,roleDescription) values (3,'ORGANIZATION_HR','Allow to do tasks related to HR');
+insert into tm_roles (id,role,roleDescription) values (4,'ORGANIZATION_DASHBOARD','Allow to do tasks related to Dashboard');
+insert into tm_roles (id,role,roleDescription) values (5,'ORGANIZATION_UNLIMITED_STAR_GIVER','Allow to send stars without limit');
+insert into tm_roles (id,role,roleDescription) values (6,'WEB_USER','Allow to navigate using the web-client');
+insert into tm_roles (id,role,roleDescription) values (7,'ORGANIZATION_ANALYTIC','Allow to do tasks related to Analytics');
+insert into tm_roles (id,role,roleDescription) values (8,'ORGANIZATION_CUSTOMER_MODE','Allow to set Customer mode on');
+insert into tm_users_roles (id,userId,roleId,dateAssigned,enabled) values (1,1,1,current_date(),1);
+insert into tm_users_roles (id,userId,roleId,dateAssigned,enabled) values (2,2,1,current_date(),1);
+
+INSERT INTO tm_price_list ( id, name, price, size, description, buyFlag) VALUES (1,'SMALL',2,1000,'small package licenses',1);
+INSERT INTO tm_price_list ( id, name, price, size, description, buyFlag) VALUES (2,'MEDIUM',1.5,5000,'medium package licenses',1);
+INSERT INTO tm_price_list ( id, name, price, size, description, buyFlag) VALUES (3,'LARGE',1,10000,'large package licenses',1);
+INSERT INTO tm_price_list ( id, name, description, buyFlag) VALUES (4,'PRO','pro package licenses',0);
+
+insert into smu_organization_properties (id, organizationId, property, propertyValue, enabled) values (1,1,'MAX_STARS_TO_GIVE',5,1);
+insert into smu_organization_properties (id, organizationId, property, propertyValue, enabled) values (2,1,'VALUE_ID_FOR_IMPORT_SKILLS_PROPERTY',4,1);
+
+insert into smu_organization_values ( id,organizationId, name, description,enabled,imageId,isTalent) values (1,1,'Think Big', 'Think big description',1,9,0);
+insert into smu_organization_values ( id,organizationId, name, description,enabled,imageId,isTalent) values (2,1,'Act Ethically', 'Act Ethicaly description',1,6,0);
+insert into smu_organization_values ( id,organizationId, name, description,enabled,imageId,isTalent) values (3,1,'Constantly Innovate', 'Value description',1,7,0);
+insert into smu_organization_values ( id,organizationId, name, description,enabled,imageId,isTalent) values (4,1,'Aim for Excellence in your Work', 'Value description',1,8,0);
+insert into smu_organization_values ( id,organizationId, name, description,enabled,imageId,isTalent) values (5,1,'Have Fun', 'Have Fun description',1,5,0);
+
+insert into smu_organization_values_lang ( id,valueId, nameShowed, descriptionShowed,languageId) values (1,1,'Think Big', ' Think big description',1);
+
+insert into smu_stars_periods (id, organizationId, maxStarToGive, startDatePeriod, periodValue, periodUnit) values (1,1,1000,timestampadd(day,-90,current_date()), 2, 'WEEK');
+
+update smu_organization_values
+set backgroundColor = '#83AF4D'
+where id = 1;
+
+update smu_organization_values
+set backgroundColor = '#2F3E8C'
+where id = 2;
+
+update smu_organization_values
+set backgroundColor = '#BF3160'
+where id = 3;
+
+update smu_organization_values
+set backgroundColor = '#138C80'
+where id = 4;
+
+update smu_organization_values
+set backgroundColor = '#E5B52E'
+where id = 5;
+
+<a name="tm_deprecated_mobile_version" id="tm_deprecated_mobile_version">create table tm_deprecated_mobile_version (</a>
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    status VARCHAR(30) NOT NULL,
+    dateClosed DATETIME NOT NULL,
+    mobileOS VARCHAR(20) NOT NULL,
+    mobileVersion VARCHAR(20) NOT NULL,
+    CONSTRAINT ukOsVersionMobile UNIQUE(mobileOS,mobileVersion)
+);
+
+<a name="tm_mobile_version_control" id="tm_mobile_version_control">CREATE TABLE tm_mobile_version_control (</a>
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    mobileOrigin VARCHAR(30) NOT NULL,
+    minimumVersion VARCHAR(20) NOT NULL,
+    suggestedVersion VARCHAR(20) NOT NULL,
+    CONSTRAINT ukMobileOrigin UNIQUE (mobileOrigin));
+
+<a name="tm_users_application_properties" id="tm_users_application_properties">CREATE TABLE tm_users_application_properties (</a> 
+id BIGINT PRIMARY KEY AUTO_INCREMENT,
+userId BIGINT NOT NULL, 
+applicationType INT(11) NOT NULL,
+    propertyType INT(11) NOT NULL,
+    value VARCHAR(2000) NOT NULL,
+CONSTRAINT fkAppPropUser FOREIGN KEY (userId) REFERENCES tm_users (id)
+);
+
+
+/**************/
+/*Translations*/
+/**************/
+/*en*/
+set @languageCode = 'en';
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Knowledge in the position',@languageCode,'Knowledge in the position');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Problem solving Capacity',@languageCode,'Problem solving Capacity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Keeps himself informed',@languageCode,'Keeps himself informed');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Learning orientation',@languageCode,'Learning orientation');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Productivity',@languageCode,'Productivity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Reliability',@languageCode,'Reliability');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Quality',@languageCode,'Quality');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Innovation &amp; Creativity',@languageCode,'Innovation &amp; Creativity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Teamwork',@languageCode,'Teamwork');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Communication',@languageCode,'Communication');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Good Attitude',@languageCode,'Good Attitud');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Shows Proactivity',@languageCode,'Shows Proactivity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Knowledge in the position',@languageCode,'Knowledge in the position');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Problem solving Capacity',@languageCode,'Problem solving Capacity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Keeps himself informed',@languageCode,'Keeps himself informed');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Learning orientation',@languageCode,'Learning orientation');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Productivity',@languageCode,'Productivity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Reliability',@languageCode,'Reliability');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Quality',@languageCode,'Quality');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Innovation &amp; Creativity',@languageCode,'Innovation &amp; Creativity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Teamwork',@languageCode,'Teamwork');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Communication',@languageCode,'Communication');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Good Attitude',@languageCode,'Good Attitud');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Shows Proactivity',@languageCode,'Shows Proactivity');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Intellectual',@languageCode,'Intellectual');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Performance',@languageCode,'Performance');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Interpersonal',@languageCode,'Interpersonal');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Personal Competences',@languageCode,'Personal Competences');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Intellectual Description',@languageCode,'Intellectual Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Performance Description',@languageCode,'Performance Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Interpersonal Description',@languageCode,'Interpersonal Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Personal Competences Description',@languageCode,'Personal Competences Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Intellectual',@languageCode,'Intellectual');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Performance',@languageCode,'Performance');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Interpersonal',@languageCode,'Interpersonal');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Personal Competences',@languageCode,'Personal Competences');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Intellectual Description',@languageCode,'Intellectual Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Performance Description',@languageCode,'Performance Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Interpersonal Description',@languageCode,'Interpersonal Description');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Personal Competences Description',@languageCode,'Personal Competences Description');
+
+/*en-US*/
+set @languageCode = 'en-US';
+insert into tm_translations(accessKey, languageCode, value)
+select accessKey, @languageCode, value from tm_translations where languageCode = 'en';
+
+/*es*/
+set @languageCode = 'es';
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Knowledge in the position',@languageCode,'Conocimiento en la posición');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Problem solving Capacity',@languageCode,'Capacidad de resolución de problemas');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Keeps himself informed',@languageCode,'Se mantiene informado');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Learning orientation',@languageCode,'Orientación al aprendizaje');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Productivity',@languageCode,'Productividad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Reliability',@languageCode,'Confiabilidad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Quality',@languageCode,'Calidad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Innovation &amp; Creativity',@languageCode,'Inovación y Creatividad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Teamwork',@languageCode,'Trabajo en Equipo');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Communication',@languageCode,'Comunicación');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Good Attitude',@languageCode,'Buena Actitud');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetency.name.Shows Proactivity',@languageCode,'Demuestra Proactividad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Knowledge in the position',@languageCode,'Conocimiento en la posición');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Problem solving Capacity',@languageCode,'Capacidad de resolución de problemas');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Keeps himself informed',@languageCode,'Se mantiene informado');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Learning orientation',@languageCode,'Orientación al aprendizaje');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Productivity',@languageCode,'Productividad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Reliability',@languageCode,'Confiabilidad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Quality',@languageCode,'Calidad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Innovation &amp; Creativity',@languageCode,'Inovación y Creatividad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Teamwork',@languageCode,'Trabajo en Equipo');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Communication',@languageCode,'Comunicación');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Good Attitude',@languageCode,'Buena Actitud');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalCompetencyEvaluation.competencyName.Shows Proactivity',@languageCode,'Demuestra Proactividad');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Intellectual',@languageCode,'Intelectual');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Performance',@languageCode,'Rendimiento');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Interpersonal',@languageCode,'Interpersonal');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.name.Personal Competences',@languageCode,'Competencias Personales');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Intellectual Description',@languageCode,'Descripción de Intelectual');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Performance Description',@languageCode,'Descripción de Rendimiento');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Interpersonal Description',@languageCode,'Descripción de Interpersonal');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopic.description.Personal Competences Description',@languageCode,'Descripción de Competencias Personales');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Intellectual',@languageCode,'Intelectual');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Performance',@languageCode,'Rendimiento');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Interpersonal',@languageCode,'Interpersonal');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicName.Personal Competences',@languageCode,'Competencias Personales');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Intellectual Description',@languageCode,'Descripción de Intelectual');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Performance Description',@languageCode,'Descripción de Rendimiento');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Interpersonal Description',@languageCode,'Descripción de Interpersonal');
+insert into tm_translations(accessKey, languageCode, value) values('SmartEvalTopicEvaluation.topicDescription.Personal Competences Description',@languageCode,'Descripción de Competencias Personales');
+
+/*en-AR*/
+set @languageCode = 'es-AR';
+insert into tm_translations(accessKey, languageCode, value)
+select accessKey, @languageCode, value from tm_translations where languageCode = 'es';
+
+/*en-CO*/
+set @languageCode = 'es-CO';
+insert into tm_translations(accessKey, languageCode, value)
+select accessKey, @languageCode, value from tm_translations where languageCode = 'es';
+
+COMMIT;
+
+<a name="tm_event_sources_location" id="tm_event_sources_location">create table tm_event_sources_location(</a>
+source_id VARCHAR(255) PRIMARY KEY,
+source_type INT,
+country CHAR(2) NOT NULL,
+city VARCHAR(255) NOT NULL,
+site VARCHAR(255) NOT NULL,
+floor VARCHAR(255),
+area VARCHAR(255)
+);
+
+<a name="tm_event_email_subscriptions" id="tm_event_email_subscriptions">CREATE TABLE tm_event_email_subscriptions(</a>
+id BIGINT AUTO_INCREMENT PRIMARY KEY,
+location_id VARCHAR(255),
+user_id BIGINT,
+email VARCHAR(255) NOT NULL,
+CONSTRAINT fkUser FOREIGN KEY (user_id) REFERENCES tm_users (id),
+CONSTRAINT fkEventSourceLocation FOREIGN KEY (location_id ) REFERENCES tm_event_sources_location (source_id)
+);</pre>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+
+<p> </p>
+</div>
+</body>
+</html>

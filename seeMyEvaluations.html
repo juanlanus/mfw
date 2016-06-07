@@ -1,0 +1,391 @@
+<!doctype html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>MF Query evals on me</title>
+  <link rel="stylesheet" href="res/mfweb.css">
+  <script src="res/jquery-1.11.3.js"></script>
+  <script src="res/mfweb.js"></script>
+  <script type="text/javascript">
+        $(document).ready(function () {
+        });
+  </script>
+</head>
+
+<body>
+    <header class="wf-header">
+      <div class="wf-info"><a href="seeMyEvaluations-notes.html" target="other"><img src="res/infoIcon.png"></a></div>
+      <img class="wf-logo" src="res/logo_226x112.png">
+      <nav class="wf-header-nav">
+        <ul class="wf-header-menu">
+          <li>Home</li>
+          <li>My team(s)</li>
+          <li>My evaluations</li>
+          <li>Settings</li>
+          <li>Log out</li>
+        </ul>
+      </nav>
+    </header>
+
+  <div class="wf-container">
+
+    <aside class="wf-user-data" title="
+This is the evaluee whose evaluations are displayed in the right hand
+panel, not necessarily the current user: it might happen that a manager
+was looking at one of her dependent's evals, and thatś the face to
+display here.
+The available properties seem to be:
+    private Integer id;
+    private Language language;
+    private Office office;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String job;
+    private String seniority;
+    private Integer profileImageId;
+    private boolean enabled;
+    private String area;
+    private String account;
+    private String project;
+    private String phoneNumber;
+    private String orgEntryDate;
+    private Integer totalStars;
+">
+      <!-- evaluee's static data -->
+      <div class="wf-user-picture">
+        <p class="wf-user-name">John W. Doe</p>
+      </div>
+      <div class="wf-user-properties">
+        <ul>
+          <li title="project">G2G/MyFeedback team</li>
+          <li title="seniority">Sr developer</li>
+          <li title="job">Web UI developer</li>
+          <li title="enabled" style="display:none;">enabled (only when disabled)</li>
+          <li title="email">&#9993; <a href="mailto:john.w.doe@globant.com">john.w.doe@globant.com</a></li>
+          <li title="phoneNumber">&#9742; 18311</li>
+          <li title="office">AR/BA/Laminar</li>
+          <li title="area">dev area</li>
+          <li title="account">account 12345</li>
+          <li title="orgEntryDate">since Sep2006</li>
+          <li title="totalStars">12 &#9734;</li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="wf-evals-data">
+
+      <!-- evaluations data structured report -->
+
+      <ul class="wf-e"> <!-- one evaluation: header and a topic per li element, stacked -->
+
+        <li class="wf-e-header"> <!-- evaluation reference data -->
+          <p class="wf-e-h-period">
+            All <span class="wf-e-h-period-x">October 2015</span> evaluations <span class="ef-e-h-period-select" title="
+Choose evaluation period and sources:
+Click to open the popup. 
+For the period, displays a couple of the most likely choices, like
+this month first day and last month first day above a general time
+lapse chooser, made up of the usual two calendars. 
+The months displayed depend on the current date, obviously. 
+And the until part displays end-of-month offerings. 
+The sources are the obvious ones. 
+              ">
+              <img src="res/dropdown.png" onclick="
+                $( '.wf-sp-filter' ).toggle();
+              ">
+            </span>
+          </p>
+          <p>
+            <span class="wf-e-h-what">By <span class="wf-e-h-who"> Any Todd</span> - manager</span>
+          </p>
+        </li>
+
+        <li class="wf-e-topic"> <!-- one topic -->
+          <div class="wf-e-topic-blah">
+            <p class="wf-e-topic-name">Interpersonal skills</p>
+            <p class="wf-e-topic-age">19 days ago</p>
+          </div>
+
+          <div class="wf-e-competences"> <!-- all the topic's competences, stacked -->
+
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Ability to listen non-defensively
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown">&uarr;</span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- another competence -->
+              <li class="wf-e-comp-name">
+                 Teamwork
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">2</span><span class="wf-e-comp-graph" title="so-so">■■□□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Communication
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- second competence -->
+              <li class="wf-e-comp-name">
+                 Good attitude
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown">&darr;</span><span class="wf-e-comp-v-number">2</span><span class="wf-e-comp-graph" title="not that good">■■□□□</span>
+              </li>
+            </ul>
+
+          </div>
+
+          <div class="wf-e-comment"> <!-- the topic's comment -->
+            <p>This has been a good month, in which you improved in almost all the subjects you were previously challenged. </p>
+            <p>Should you keep doing so, in a few months you might be promoted to Grand Chauncellor of the Order. </p>
+          </div>
+
+
+        </li>
+
+        <li class="wf-e-topic"> <!-- one topic -->
+          <div class="wf-e-topic-blah">
+            <p class="wf-e-topic-name">Intellectual</p>
+            <p class="wf-e-topic-age">12 days ago</p>
+          </div>
+
+          <div class="wf-e-competences"> <!-- all the topic's competences, stacked -->
+
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Ability to listen non-defensively
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- second competence -->
+              <li class="wf-e-comp-name">
+                 Communication
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-pending">pending</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Ability to win friends and influence other persons
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown">&uarr;</span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="excellent">■■■■■</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- second competence -->
+              <li class="wf-e-comp-name">
+                 Communication
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">2</span><span class="wf-e-comp-graph" title="needs improvement">■□□□□</span>
+              </li>
+            </ul>
+
+          </div>
+
+          <div class="wf-e-comment"> <!-- the topic's comment -->
+            <p>This has been a good month, in which you improved in almost all the subjects you were previously challenged. </p>
+            <p>Should you keep doing so, in a few months you might be promoted to Grand Chauncellor of the Order. </p>
+            <p>This comment is lengthy, to show how the layout behaves in this case. </p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+            <p>Another paragraph makes it really, really, long!</p>
+          </div>
+
+        </li>
+
+      </ul>
+
+      <ul class="wf-e"> <!-- one evaluation: header and a topic per li element, stacked -->
+
+        <li class="wf-e-header"> <!-- evaluation reference data -->
+          <p>
+            <span class="wf-e-h-what">By
+            <span class="wf-e-h-who" title="The name of the team is needed, as there are
+              a number of globers that are members of more than one team."> G2G MyFeedback team</span>
+             - peers</span>
+          </p>
+        </li>
+
+        <li class="wf-e-topic"> <!-- one topic -->
+          <div class="wf-e-topic-blah">
+            <p class="wf-e-topic-name">Interpersonal skills</p>
+          </div>
+
+          <div class="wf-e-competences"> <!-- all the topic's competences, stacked -->
+
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Ability to listen non-defensively
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown">&uarr;</span><span class="wf-e-comp-v-number">3.2</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- another competence -->
+              <li class="wf-e-comp-name">
+                 Teamwork
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">2.1</span><span class="wf-e-comp-graph" title="nice">■■□□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- another competence -->
+              <li class="wf-e-comp-name">
+                 Nice guy
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">yes</span><span class="wf-e-comp-graph" title="OK">&#10003;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Communication
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- second competence -->
+              <li class="wf-e-comp-name">
+                 Good attitude
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown">&darr;</span><span class="wf-e-comp-v-number">2.3</span><span class="wf-e-comp-graph" title="nice">■■□□□</span>
+              </li>
+            </ul>
+
+          </div>
+
+        </li>
+
+        <li class="wf-e-topic"> <!-- one topic -->
+          <div class="wf-e-topic-blah">
+            <p class="wf-e-topic-name">Intellectual</p>
+          </div>
+
+          <div class="wf-e-competences"> <!-- all the topic's competences, stacked -->
+
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Ability to listen non-defensively
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- second competence -->
+              <li class="wf-e-comp-name">
+                 Communication
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-pending">pending</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- one competence -->
+              <li class="wf-e-comp-name">
+                 Ability to listen non-defensively
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown">&uarr;</span><span class="wf-e-comp-v-number">3</span><span class="wf-e-comp-graph" title="nice">■■■□□</span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- another competence -->
+              <li class="wf-e-comp-name">
+                 Smart guy
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">no</span><span class="wf-e-comp-graph" title="dumb">- &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span>
+              </li>
+            </ul>
+            <ul class="wf-e-comp"> <!-- second competence -->
+              <li class="wf-e-comp-name">
+                 Communication
+              </li>
+              <li class="wf-e-comp-value">
+                 <span class="wf-e-comp-v-updown"></span><span class="wf-e-comp-v-number">2</span><span class="wf-e-comp-graph" title="nice">■■□□□</span>
+              </li>
+            </ul>
+
+          </div>
+
+        </li>
+
+      </ul>
+
+    </section>
+
+    <!-- POPUP: evaluations filters *********************************** start ************************************  -->
+    <div class="wf-sp-filter">
+      <div class="wf-sp-header">
+        <img src="res/close.png" onclick="
+          $( '.wf-sp-filter' ).toggle();
+        ">
+        <h2>Select query period and sources</h2>
+      </div>
+      <div class="wf-sp-body">
+
+        <h4>Since:</h4>
+        <ul class="wf-sp-options">
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_since" value="1" checked>October 1st. </label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_since" value="2">September 1st. </label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_since" value="3">Choose date</label></li>
+        </ul>
+
+        <h4>Until:</h4>
+        <ul class="wf-sp-options">
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_until" value="1" checked>Today </label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_until" value="2">September 30th. </label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_until" value="3">Choose date</label></li>
+        </ul>
+
+        <h4>Source:</h4>
+        <ul class="wf-sp-options">
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_source" value="1" checked>All </label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_source" value="2">My managers</label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_source" value="3">My team</label></li>
+          <li class="wf-sp-option"><label><input type="radio" name="wf_sp_source" value="4">My employees</label></li>
+        </ul>
+
+      </div>
+      <div class="wf-sp-footer">
+        <button name="cancel" title="
+this button is not included in the tabbing sequence,
+and it is binded to the escape key"
+        onclick="
+          $( '.wf-sp-filter' ).toggle();
+        "
+        >cancel</button>
+        <button name="go" title="this is the default button, bound to the enter key"
+        onclick="
+          $( '.wf-sp-filter' ).toggle();
+        "
+        >go</button>
+      </div>
+    </div>
+    <!-- POPUP: evaluations filters *********************************** end **************************************  -->
+
+  </div>
+
+  <footer class="wf-footer">
+    &nbsp; 
+  </footer>
+</body>

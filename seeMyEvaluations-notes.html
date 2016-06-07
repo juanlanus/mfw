@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Language" content="en">
+  <title>Notes - MF Query evals on me</title>
+  <link rel="stylesheet" href="res/mfweb-notes.css">
+  <script type="text/javascript" src="res/jquery-1.11.3.js">
+ </script>
+  <script type="text/javascript" src="res/mfweb.js">
+ </script>
+  <script type="text/javascript">
+        $(document).ready(function () {
+        });
+  </script>
+</head>
+
+<body>
+
+<div class="n-header">
+<h2>seeMyEvaluations comments</h2>
+
+<p></p>
+</div>
+
+<div>
+<img> 
+
+<p></p>
+
+<p><img src="res/seeMyEvaluations-1.png" target="other"
+style="max-width:681px; width:100%;"></p>
+
+<p></p>
+<ul>
+  <li><span class="n-UI-ref">Green header</span> 
+    <p>Disregard, it's only a placeholder. The logo, the colors, and the menu,
+    will be defined in other document. </p>
+    <p>Especially, the wording of the menu items is wrong. </p>
+    <p>Moreover, the branding should be easily replaceable by the client's. </p>
+  </li>
+  <li><span class="n-UI-ref">Left-hand column</span> 
+    <p>The date items shown are taken grom the user model of the backend, and
+    might change. </p>
+    <ol style="margin-left:4em">
+      <li>G2G/Smart evaluations project</li>
+      <li>Sr developer</li>
+      <li>Web UI developer</li>
+      <li>✉ john.w.doe@globant.com</li>
+      <li>☎ 18311</li>
+      <li>AR/BA/Laminar</li>
+      <li>dev area</li>
+      <li>account 12345</li>
+      <li>since Sep2006</li>
+      <li>12 ☆</li>
+    </ol>
+    <p>At the moment the properties (and their mapping) are:</p>
+    <pre>    private Integer id;
+    private Language language;
+    private Office office;          [6]
+    private String firstName;       [name]
+    private String lastName;        [name]
+    private String email;           [4]
+    private String job;             [3]
+    private String seniority;       [2]
+    private Integer profileImageId; [image]
+    private boolean enabled;
+    private String area;            [7]
+    private String account;         [8] 
+    private String project;         [1]
+    private String phoneNumber;     [5]
+    private String orgEntryDate;    [9]
+    private Integer totalStars;     [10]</pre>
+  </li>
+  <li><span class="n-UI-ref">All October 2015 evaluations</span> 
+    <p>Clicking the dropdown icon to the right opens the filters popup (try
+    it). </p>
+    <p>This title is built in the processing of the filters. </p>
+    <p>The word "All" is because of the "source" choice. The other sources
+    translate into "My managers", "My team" and "My employees". </p>
+    <p>The "October 2015" part is so bacause the user chose the full month, so
+    we avoid showing "from 01-10-2015 until 31-10-2015", instead the single
+    word "October" makes it much easier to read. </p>
+    <p>Notice that "October 2015" is highlighted (as a few other labels below).
+    This allows the user to scan the page very quickly, as those elements stop
+    their eyes during the scan. Notice how the personal data, in the left-hand
+    column, does not stand out and thus it does not interfere with the reading
+    of the relevant parts. </p>
+  </li>
+  <li><span class="n-UI-ref">The "Select query period and sources" popup</span>
+    <p>The "since" and "until" sections are built to make it easier to choose
+    the most likely periods: the previous month or the current one. </p>
+    <p>The selected options should reflect that likeliness, like for example id
+    it's October 2nd. then offer the previous month. </p>
+    <p>The third options render the usual calendars bound to keyboard input
+    fields more suitable for people that are keyboard-friendly (the calendars
+    are for chubby women attempring to purchase cat chow online). </p>
+    <p>The "Source" part is pretty obvious. The default is "All", the most
+    likely one. </p>
+    <p>When the page opens, it is already displaying the evaluations selected
+    by the default options, to save the user the burden of requesting them
+    explicitly, each time. </p>
+    <p>The Esc key must be binded to the [cancel] buttin, and the Enter key to
+    yhe [go] button. </p>
+  </li>
+  <li><span class="n-UI-ref">"By Any Todd - manager" and "By G2G MyFeedback
+    team - peers"</span>
+    <p>This are, obviously, the who evaluated this guy. The team label is so
+    because in the future this UI might need to handle multiple teams, cleanly.
+    </p>
+    <p>The "G2G MyFeedback" part is the division of the company (G2G) and the
+    project this guy is in. </p>
+    <p>The team evaluation has no date. The date in the manager evaluation
+    might not be available in the model, don't worry. </p>
+  </li>
+  <li><span class="n-UI-ref">"Interpersonal skills" ...</span>
+    <p>This is a topic with its competences. </p>
+    <p>The chart part in this wireframe is made up of characters, not very
+    suitable for values like the 3.2 that is below. Also the green should be
+    replaced bt gray. </p>
+    <p>The text to the right is the optional comment. </p>
+    <p>The evaluation values have a textual value too. It is displayed when the
+    mouse pointer hovers the graph (the green squares). </p>
+  </li>
+  <li><span class="n-UI-ref">Responsive</span>
+    <p>Notice that when the viewport is narrowed the elements <em>move
+    under</em> (not ehe header's). . </p>
+    <p>Else, this layout leverages the width of the desktop screens to display
+    as much evaluation data as possible in a single screen. </p>
+  </li>
+  <li><span class="n-UI-ref">Where to go from here</span>
+    <p>It is not shown, i have no idea yet. </p>
+    <p></p>
+  </li>
+</ul>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+
+<p></p>
+</div>
+</body>
+</html>
