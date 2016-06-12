@@ -296,9 +296,12 @@
 				this.loader(true);
 				options.onBefore.call(this);
 				window.clearTimeout(timeout);
-				timeout = window.setTimeout(function () {
-					self.go();
-				}, options.delay);
+				timeout = window.setTimeout(
+          function (){
+            self.go();
+          },
+          options.delay
+        );
 			}
 			
 			

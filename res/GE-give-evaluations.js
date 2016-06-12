@@ -27,7 +27,7 @@
     '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
     '  </div>' +
     '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
-    '  <div class="ge-e-display" contenteditable="true" tabindex="0" title="out of <%= u.def.topValue %>"><%= u.v.text %></div>' +
+    '  <input type="text" class="ge-e-display" tabindex="0" title="out of <%= u.def.topValue %>" value=<%= u.v.text %>>' +
     '</div>';
 
   GE.template.evalItemP100 =
@@ -36,7 +36,7 @@
     '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
     '  </div>' +
     '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
-    '  <div class="ge-e-display" contenteditable="true" tabindex="0"><%= u.v.text %></div>' +
+    '  <input type="text" class="ge-e-display" tabindex="0" value=<%= u.v.text %>>' +
     '</div>';
 
   GE.template.evalItemBinary =
@@ -45,7 +45,7 @@
     '    <div class="ge-e-binary-<%= (u.v.value ? "yes" : "no") %>">&nbsp;</div>' +
     '  </div>' +
     '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
-    '  <div class="ge-e-display" contenteditable="true" tabindex="0"><%= u.v.text %></div>' +
+    '  <input type="text" class="ge-e-display" tabindex="0" value=<%= u.v.text %>>' +
     '</div>';
 
   GE.template.evalItemStep =
@@ -59,8 +59,11 @@
     '    </tbody></table>' +
     '  </div>' +
     '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>">Advise acceptance</div>' +
-    '    <div class="ge-e-display" contenteditable="true" tabindex="0"><%= u.v.text %></div>' +
-    '  </div>';
+    '  <input type="text" id="ge-e-stepInput" class="ge-e-display" tabindex="0" value="<%= u.v.text %>">' +
+    '  <ul id="ge-e-stepInputChoices" class="ge-e-stepChoices" style="display:none;">' +
+    '    <% _.each( u.def.steps, function( stepName, i, steps ){ %><li tabindex="0"><%= ( i + 1 ) + " " + stepName %></li><% }); %>' +
+    '  </ul>' +
+    '</div>';
 
   GE.template.evalItemSpacer =
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-spacer">&nbsp;</div>';
@@ -302,7 +305,7 @@
         switch( event.type ){
           case 'mouseenter':
             GE.isHoveringAValue = true;
-            GE.hoverStartValue = $theDisplay.text();            // TODO: for step items saves all the step names?
+            GE.hoverStartValue = $theDisplay.val();            // TODO: for step items saves all the step names?
             $theDisplay.addClass( 'ge-e-display-hovered' );
             GE.calculatePointedValue( $theItem, event );
             $this.closest( '.ge-e-item' ).find( '.ge-e-name' ).stop().animate( { opacity:0.30 }, 700 );
@@ -315,7 +318,7 @@
           case 'mouseleave':
             $this.closest( '.ge-evaluations').find( '.ge-e-display-hovered' ).removeClass( 'ge-e-display-hovered' );
             if( GE.isHoveringAValue ){ // if user didn't click then restore initial value
-              $theDisplay.text( GE.hoverStartValue );
+              $theDisplay.val( GE.hoverStartValue );
             };
             GE.isHoveringAValue = false;
             GE.hoverStartValue = '';
@@ -363,7 +366,7 @@
   GE.setDisplayText = function( $evalItem, displayText ){
   // given an element of an evaluation item, set its display text
     var $display = GE.getDisplayElement( $evalItem );
-    $display.text( displayText );
+    $display.val( displayText );
   };
 
   GE.processKBInput = function( $e ){
@@ -495,25 +498,106 @@
   };
 
   GE.buildStepItemUI = function( $eventTarget, evalItemDef ){
-    // build input UI for enumerated eval items
-    var html = [];
-    _.each(
-      evalItemDef.steps,
-      function( stepName, i, steps ){
-        html.push( '<option value="' + (i + 1) + '">' + stepName + '</option>' );
+    // show choices selector and enable step type eval item quicksearch
+    $( '#ge-e-stepInputChoices' ).show( 400 );
+    var qs = $('#ge-e-stepInput').quicksearch(
+      '#ge-e-stepInputChoices li',
+      {
+        removeDiacritics: true,
+        show: function () { $(this).removeClass('hiddenByQS'); },
+        hide: function () { $(this).addClass('hiddenByQS'); },
       }
     );
-    html = '<select name="evaluation" size="' + evalItemDef.steps.length + '">' + html.join('') + '</select>';
-    // >>>>>>>>>>>>>>>>> $eventTarget.html( html );
+    // capture kb input on step input choices
+    $( '#ge-e-stepInputChoices li' ).on(
+      'keypress.kbStep',
+      function( event ){
+        var $this = $( this );
+        var $theDisplayElement = $this.closest( '.ge-e-item' ).find( '.ge-e-display' );
+        var stepName = $this.text();
+        stepName = stepName.substring( stepName.indexOf( ' ' ) + 1 ); // trim number
+        switch( event.which ){
+          case 32: // space: select current value
+            console.log( 'spacebar in ' + $this.text() );
+            event.preventDefault();
+            $theDisplayElement.val( stepName );
+            break;
+          case 13: // enter: select current value and go forward
+            console.log( 'enter in ' + $this.text() );
+            event.preventDefault();
+            $theDisplayElement.val( stepName );
+            $this.parent().hide( 100 );
+            break;
+        };
+      }
+    );
+/* step-type eval item example:
+<div id="ge-e-item-7" class="ge-e-item ge-e-step">                   2: get a ref to this
+  <div class="ge-e-value">                        
+    <table><tbody>
+      <tr>
+        <td class="ge-e-one-step ge-e-one-step-on" style="width:20%">awful</td>
+        <td class="ge-e-one-step ge-e-one-step-on" style="width:20%">low</td>
+        <td class="ge-e-one-step ge-e-one-step-on" style="width:20%">regular</td>
+        <td class="ge-e-one-step ge-e-one-step-off" style="width:20%">high</td>
+        <td class="ge-e-one-step ge-e-one-step-off" style="width:20%">impressing</td>
+      </tr>
+    </tbody></table>
+  </div>
+  <div class="ge-e-name">Advise acceptance</div>
+  <input type="text" class="ge-e-display" tabindex="0" value="">     3: get a ref to this and set its text
+  <ul id="ge-e-stepInputChoices" class="ge-e-stepChoices">           
+    <li tabindex="0">0 awful</li>                                    1: kb action here
+    <li tabindex="0">1 low</li>
+    <li tabindex="0">2 regular</li>
+    <li tabindex="0">3 high</li>
+    <li tabindex="0">4 impressing</li>
+  </ul>
+</div>
+$(this).trigger({
+    type: 'keypress',
+    which: 9
+});
+    up = 38
+    down = 40
+    left = 37
+    right = 39
+*/
+    // move up and down within the steps list with the arrows
+    $( '#ge-e-stepInputChoices li' ).on(
+      'keydown.kbStep',
+      function( event ){
+        var $this = $( this );
+        switch( event.which ){
+          case 38: // keyup: move to previous
+            console.log( 'keyup in ' + $this.text() );
+            event.preventDefault();
+            event.stopPropagation();
+            event.which = 0;
+            var $prev = $this.prev();
+            if( $prev.length ){ $prev.focus() };
+          break;
+          case 40: // keydown: move to next
+            console.log( 'keydown in ' + $this.text() );
+            event.preventDefault();
+            event.stopPropagation();
+            event.which = 0;
+            var $next = $this.next();
+            if( $next.length ){ $next.focus() };
+          break;
+        };
+      }
+    );
+
   };
 
   GE.setEvalItemKBHandler = function( $eventTarget, evalItemDef ){
     // the display of an eval item has focus and gets KB input
     $eventTarget.off( 'keypress' );
 
-    if( ! GE.mouseIsDown){ // if focus given by keyboard action
-      GE.selectElementText( $eventTarget[0] ); // select current text
-    };
+    // if( ! GE.mouseIsDown){ // if focus given by keyboard action
+    //   GE.selectElementText( $eventTarget[0] ); // select current text
+    // };
 
     // build input UI for enumerated eval items
     if( evalItemDef.type === 'step' ){
@@ -537,7 +621,7 @@
           switch( event.which ){
           case 32: // spacebar: if checked then uncheck else check
             // console.log( 'spacebar in binary eval item containing "' + $eventTarget.text().trim() + '"' );
-            $eventTarget.text( ( $eventTarget.text().trim() === '\u2713' ) ? '\u274c' : '\u2713' ); // ✓ &#x2713; ❌ &#x274c; 
+            $eventTarget.val( ( $eventTarget.val().trim() === '\u2713' ) ? '\u274c' : '\u2713' ); // ✓ &#x2713; ❌ &#x274c; 
             break;
           case 49:  // 1: set on
           case 38:  // up arrow: set on
@@ -546,14 +630,14 @@
           case 89: // Y: set on
           case 115: // s: set on
           case 83: // S: set on
-            $eventTarget.text( '\u2713' );
+            $eventTarget.val( '\u2713' );
             break;
           case 48:  // 0: set off
           case 40:  // down arrow: set off
           case 45: // -: set off
           case 110: // n: set off
           case 78: // N: set off
-            $eventTarget.text( '\u274c' );
+            $eventTarget.val( '\u274c' );
             break;
           }
           event.preventDefault();
@@ -631,7 +715,7 @@
       }
     );
 
-    // enable quicksearch
+    // enable evaluees quicksearch
     var qs = $('#userFilter').quicksearch(
       '#ge-evalueeGroups .ge-oneUser',
       {
@@ -672,20 +756,19 @@
               $theValue = $( event.target );
               $theItem = $eventTarget.closest( '.ge-e-item' ); // DEBUG?
               console.log( '  exit from edited field ' + $theItem.find( '.ge-e-name' ).text()
-              + ' ' +  $(this).attr('class') + ' ' + $theValue.text() + ' type:' + evalItemDef.type );
+              + ' ' +  $(this).attr('class') + ' ' + $theValue.val() + ' type:' + evalItemDef.type );
               GE.resetEvalItemKBHandler( $theValue );
-              // it's already there! $theValue.text( '' + Math.round( $theItem.val() / /* evalData.def.topValue */ 3000 * 10000 ) / 100 );
               $theValue.removeClass( 'ge-e-value-error' );
               switch ( evalItemDef.type ){
               case 'number':
-                if( parseInt( $theValue.text(), 10 ) > evalItemDef.topValue ){
+                if( parseInt( $theValue.val(), 10 ) > evalItemDef.topValue ){
                   $theValue.addClass( 'ge-e-value-error' );
                   GE.beep();
                   event.preventDefault();
                 }
                 break;
               case 'p100':
-                if( parseInt( $theValue.text(), 10 ) > 100 ){
+                if( parseInt( $theValue.val(), 10 ) > 100 ){
                   $theValue.addClass( 'ge-e-value-error' );
                   GE.beep();
                   event.preventDefault();

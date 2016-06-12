@@ -91,7 +91,8 @@
       .ge-e-name { pointer-events:none; }
       .ge-e-name-optional { color:rgb(96,96,196); }
       .ge-e-display { position:absolute; top:-1px; right:0; color:rgb(80,80,80); font-size:85%; font-weight:bold; padding:4px; 
-        padding-left:0; text-align:right; vertical-align:super; width:14%; height:24px; }
+        padding-left:0; text-align:right; vertical-align:super; width:14%; height:24px; border:0; }
+      .ge-e-display:focus { outline:1px solid rgb(222,222,255); background-color:rgb(240,240,232); }
       .ge-e-display-hovered { color:white; background-color:black; outline:1px dotted rgb(128,128,128); }
 
       .ge-e-header { min-height:24px; margin-top:2px; padding-top:2px; background-color:rgb(128,128,128); color:rgb(255,255,255);
@@ -110,6 +111,10 @@
       .ge-e-one-step.ge-e-one-step-on  { background-color:rgb(192,192,255); }
       .ge-e-one-step.ge-e-one-step-off { background-color:rgb(240,240,240); }
       .ge-e-one-step:hover { color:black; z-order:99; }
+      .ge-e-stepChoices { list-style-type:none; text-align:left; width:8em; position:absolute; right:0; top:26px;
+        background-color:rgb(240,240,232); border:1px solid silver; border-radius:4px; font-size:85%; padding:8px;
+        z-index:99; }
+      .ge-e-stepChoices  li { margin-left:0 }
 
       .ge-e-item { clear:both; }
        
