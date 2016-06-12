@@ -16,6 +16,80 @@
     }
   };
 
+  //================================================================================
+  // Environment:
+  //   GE.evalItems               eval items definitions, by criteria and id
+  //   GE.userGroups              evaluee sets and their selection queries
+  //   GE.evaluations             the evaluations data file, indexed by user id
+  //   GE.currentUserEvals        last two evaluations for the current user
+  //   GE.emptyEvaluation         generated empty evals, indexed by eval criteria
+  //   GE.currentUser             selected evaluee file entry
+  //   GE.getUserData(id)         return the user file entry with id == id
+  //   GE.buildNewEvaluation(c)   build an empry evaluation with criteria c
+  //   GE.getCurrentUserEvals(i)  load GE.currentUserEvals with an attitude
+  //   GE.putCurrentUserEvals()   store GE.currentUserEvals in file TODO
+  //   GE.getEvalItemValue(id)    get values for the current eval with id == id
+  // * GE.evalItemsBuild($t,c)    build the evals UI for user displayed in $t
+  //
+  // * GE.setEvalItemHoverHandlers()
+  //   GE.selectUsers( groupId, usersAlreadyListed )
+  //   GE.setEvalValue( $evalItem, value, text )
+  //   GE.getDisplayElement( $evalItem )
+  //   GE.setDisplayText( $evalItem, displayText )
+  //   GE.processKBInput( $e )
+  //   GE.getItemDefs( $this )
+  // * GE.calculatePointedValue( $this, hoverEvent )
+  //   GE.handleNumEvalClick( $this, $e, event )
+  // * GE.handleEvalClick( $e, event )
+  // * GE.buildStepItemUI($t,d)   build quicksearch artifact for step-type eval
+  //                              items and set kb evant handlers
+  // * GE.setEvalItemKBHandler($t,d) set kb action handlers for all eval item types
+  //   GE.resetEvalItemKBHandler( $eventTarget )
+  //   GE.isDigit(x)              return true if x is a digit 
+  //   GE.selectElementText(e)    select element's text on kb focus (automatic for <input>)
+  //   GE.beep()                  make a brief complain sound
+  //   $()                        set focus handlers
+  //
+  //================================================================================
+  // Class for step-type eval items
+  // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
+  GE.evalItemStep = function( criteria, evalItemId ){
+    this.evalItemId = evalItemId;
+    this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
+    this.steps = this.evalItem.steps;
+    this.criteria = undefined; 
+    this.hasValue = undefined;
+    this.value = undefined;
+  };
+  GE.evalItemStep.prototype.text = function(){
+    return this.hasValue ? this.steps[ this.value ] : '';
+  };
+  GE.evalItemStep.prototype.buildHTML = function( evalData ){
+    if( ! this.template ){
+      this.template = _.template( this.templateSource );
+    };
+    var evalData = { def:this.evalItem, value:0, text:'' };
+    evalData.v = GE.getEvalItemValue( this.evalItemId ); // { value:..., text:..., hasValue:... }
+    // TODO: activate GE.evalsHTML.push( this.template( evalData ) );
+    return this.template( evalData );
+  };
+  GE.evalItemStep.prototype.templateSource = 
+    '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-step">' +
+    '  <div class="ge-e-value">' +
+    '    <table><tbody>' +
+    '      <tr><% _.each( u.def.steps, function( evalItem, i, itemsList ){ %>' +
+    '' +    '<td class="ge-e-one-step ge-e-one-step-<%= (i >= u.v.value)? "off":"on" %>" style="width:<%= 100 / u.def.steps.length %>%"><%= u.def.steps[i] %></td>' +
+    '      <% } ) %></tr>' +
+    '    </tbody></table>' +
+    '  </div>' +
+    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>">Advise acceptance</div>' +
+    '  <input type="text" id="ge-e-stepInput" class="ge-e-display" tabindex="0" value="<%= u.v.text %>">' +
+    '  <ul id="ge-e-stepInputChoices" class="ge-e-stepChoices" style="display:none;">' +
+    '    <% _.each( u.def.steps, function( stepName, i, steps ){ %><li tabindex="0"><%= ( i + 1 ) + " " + stepName %></li><% }); %>' +
+    '  </ul>' +
+    '</div>';
+
+  //================================================================================
   GE.template = {};
 
   GE.template.evalItemHeader =
@@ -228,6 +302,7 @@
     // build the eval items set UI for the clicked user
     GE.currentUserEvals = GE.getCurrentUserEvals( GE.currentUser.id, GE.currentUser.evaluationCriteria );
     var evalsHTML = [];
+    GE.evalsHTML = [];
     _.each(
       GE.evalItems[ evaluationCriteria ],
       function( evalItemDef, i, evalItemDefs ){
@@ -265,13 +340,10 @@
           break;
         case 'step':
           // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
-          if( evalData.v.hasValue ){
-            text = evalData.def.steps[ evalData.v.value ];
-          } else {
-            text = '';
-          }
-          var templateForStep = _.template( GE.template.evalItemStep );
-          evalsHTML.push( templateForStep( evalData ) );
+          // if( evalData.v.hasValue ){ text = evalData.def.steps[ evalData.v.value ]; }
+          // else { text = ''; }
+          var stepObject = new GE.evalItemStep( evaluationCriteria, evalItemDef.id );
+          evalsHTML.push( stepObject.buildHTML( evalData ) );
           break;
         case 'spacer':
           // 8: { id:'8', type:'spacer' }
@@ -288,6 +360,9 @@
     $HTMLTarget.html( evalsHTML.join( '' ) );
     GE.setEvalItemHoverHandlers();
   };
+
+
+
 
   GE.setEvalItemHoverHandlers = function(){
     // when hovering the value bar, show the value associated with the pointer's position
