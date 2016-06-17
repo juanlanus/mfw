@@ -423,11 +423,20 @@ of client. </p>
   </li>
   <li>Store kb-changed values into the eval object</li>
   <li>Reflect kb-entered values in the approrpriate gaphics bar</li>
+  <li>Not destroying the input UI of an evaluee (allowing more than one at
+  a given time) might result in duplicate DOM ids</li>
   <li><img alt="doing now" src="res/caramba_yellow.gif">
     Refactor eval items into classes, one per eval item type:
     <ul>
       <li><img alt="doing now" src="res/caramba_yellow.gif"> Create an
         eval item object whenever an eval item is built by GE.evalItemsBuild()
+        <ul>
+          <li>header type items</li>
+          <li>number type items</li>
+          <li>percent type items</li>
+          <li><img alt="doing now" src="res/caramba_yellow.gif"> step type items</li>
+          <li>binary type items</li>
+          <li>spacer type items</li>
       </li>
       <li>Store a ref to the eval item object in the jQuery data attribute
         of the eval item HTML element</li>
