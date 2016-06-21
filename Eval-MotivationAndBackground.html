@@ -367,7 +367,7 @@ of client. </p>
   </li>
 </ol>
 <ul>
-  <li>Whenever a value is entered check if the eval sets are complete and
+  <li>Whenever a value is changed check if the eval sets are complete and
     display a ✓</li>
   <li class="doneItem">Add a quicksearch widget for the evaluees list</li>
   <li>Add an "evaluation complete" marker in the evaluee's data</li>
@@ -438,7 +438,10 @@ of client. </p>
           <li>binary type items</li>
           <li>spacer type items</li>
       </li>
-      <li>Store a ref to the eval item object in the jQuery data attribute
+      <li>Instead of building the UI as an HTML text, build it as a set of elements
+        initially decoupled from DOM, and attach them at the end, in order to be able to 
+        create references to the parts of an item</li>
+      <li class="doneItem">Store a ref to the eval item object in the jQuery data attribute
         of the eval item HTML element</li>
       <li>Properties:
         <ol>
