@@ -52,6 +52,14 @@
   //
   //================================================================================
   // Class for header-type eval items
+  //
+  //   #    #  ######    ##    #####   ######  #####
+  //   #    #  #        #  #   #    #  #       #    #
+  //   ######  #####   #    #  #    #  #####   #    #
+  //   #    #  #       ######  #    #  #       #####
+  //   #    #  #       #    #  #    #  #       #   #
+  //   #    #  ######  #    #  #####   ######  #    #
+  //
   // 1: { id:'1', type:'header', description:'First group of eval items' },
   // <div id="ge-e-item-1" class="ge-e-item ge-e-header">First group of eval items</div>
   GE.evalItemHeader = function( criteria, evalItemId ){
@@ -74,7 +82,106 @@
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-header"><%= u.def.description %></div>';
 
   //================================================================================
+  // Class for number-type eval items
+  //
+  //   #    #  #    #  #    #  #####   ######  #####
+  //   ##   #  #    #  ##  ##  #    #  #       #    #
+  //   # #  #  #    #  # ## #  #####   #####   #    #
+  //   #  # #  #    #  #    #  #    #  #       #####
+  //   #   ##  #    #  #    #  #    #  #       #   #
+  //   #    #   ####   #    #  #####   ######  #    #
+  //
+  // 2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
+  /*
+    <div id="ge-e-item-3" class="ge-e-item ge-e-p100">
+      <div class="ge-e-value">
+        <div class="ge-e-value-A" style="width: 78.8235%;">&nbsp;</div>
+      </div>
+      <div class="ge-e-name" style="opacity: 1;">Anthropometric synergic attitude</div>
+      <input type="text" class="ge-e-display" tabindex="0" value="">
+    </div>
+  */
+  GE.evalItemNumber = function( criteria, evalItemId ){
+    this.element = undefined;  // ref to the associated DOM element
+    this.criteria = criteria; 
+    this.evalItemId = evalItemId;
+    this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
+  };
+  GE.evalItemNumber.prototype.setDOMElementReferences = function( $theItem ){
+    this.$element = {}; // this item's internal elements
+    this.$element.$item = $theItem;
+    this.$element.$value = $theItem.find( '.ge-e-value' );
+    this.$element.$display = $theItem.find( '.ge-e-display' );
+    this.$element.$name = $theItem.find( '.ge-e-name' );
+  };
+  // text content of the $display element
+  GE.evalItemNumber.prototype.text = function(){
+    return this.hasValue ? this.evalItem.steps[ this.value ] : '';
+  };
+  // value pointed to by mouse during hover
+  GE.evalItemNumber.calculatePointedValue = function( hoverEvent ){
+    value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
+    text = hoverEvent.target.textContent;
+  };
+  GE.evalItemNumber.prototype.handleHover = function( hoverEvent ){
+    switch( hoverEvent.type ){
+      case 'mouseenter':
+        this.isHoveringAValue = true;
+        this.hoverStartValue = this.value;
+        this.$element.$display.addClass( 'ge-e-display-hovered' );
+        var $A = this.$element.$item.find( '.ge-e-value-A' );
+        var leftEdgePosition = $A.offset().left;
+        var valPx = hoverEvent.pageX - leftEdgePosition;
+        value = Math.round( valPx * this.evalItem.topValue / $A.parent().width());
+        text = '' + value;
+        break;
+      case 'mousemove':
+        if( this.isHoveringAValue ){
+          GE.calculatePointedValue( this.$element.$item, hoverEvent );
+        }
+        break;
+      case 'mouseleave':
+        this.isHoveringAValue = false;
+        this.hoverStartValue = null;
+        this.$element.$display.removeClass( 'ge-e-display-hovered' );
+        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
+          this.$element.$display.val( GE.hoverStartValue );
+        };
+        this.isHoveringAValue = false;
+        this.hoverStartValue = '';
+        break;
+      default:
+        break;
+    }
+  };
+
+
+
+  GE.evalItemNumber.prototype.buildHTML = function( evalData ){
+    if( ! this.template ){
+      this.template = _.template( this.templateSource );
+    };
+    return this.template( evalData );
+  };
+  GE.evalItemNumber.prototype.templateSource = 
+    '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-number">' +
+    '  <div class="ge-e-value">' +
+    '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
+    '  </div>' +
+    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
+    '  <input type="text" class="ge-e-display" tabindex="0" title="out of <%= u.def.topValue %>" value=<%= u.v.text %>>' +
+    '</div>';
+
+  //================================================================================
   // Class for step-type eval items
+  //
+  //    ####    #####  ######  #####
+  //   #          #    #       #    #
+  //    ####      #    #####   #    #
+  //        #     #    #       #####
+  //   #    #     #    #       #
+  //    ####      #    ######  #
+  //
   // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
   GE.evalItemStep = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associate DOM element
@@ -110,7 +217,7 @@
         this.hoverStartValue = this.value;
         this.$element.$item.addClass( 'ge-e-display-hovered' );
         GE.calculatePointedValue( $theItem, hoverEvent );
-        $this.closest( '.ge-e-item' ).find( '.ge-e-name' ).stop().animate( { opacity:0.30 }, 700 );
+        this.$element.$name.stop().animate( { opacity:0.30 }, 700 );
         break;
       case 'mousemove':
         if( GE.isHoveringAValue ){
@@ -129,8 +236,6 @@
       default:
         break;
     }
-
-
   };
   GE.evalItemStep.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
@@ -381,10 +486,15 @@
           break;
         case 'number':
           // 2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
+          var numberObject = new GE.evalItemNumber( evaluationCriteria, evalItemDef.id );
           evalData.v.width = Math.round( evalData.v.value / evalData.def.topValue * 10000 ) / 100;
+          var $theItem = $( numberObject.buildHTML( evalData ) );
+          $UIElements.append( $theItem ); 
+          numberObject.setDOMElementReferences( $theItem );
+
           var templateForNumber = _.template( GE.template.evalItemNumber );
           evalsHTML.push( templateForNumber( evalData ) );
-          evalsObjects.push( {} );
+          evalsObjects.push( numberObject );
           break;
         case 'p100':
           // 3: { id:'3', type:'p100',   description:'Anthropometric synergic attitude' },
@@ -458,8 +568,12 @@
           event.stopPropagation;
           return false;
         };
+        // for eval items with object, the objetc's handleHover method does the work
         var eio = $theItem.data(); // eval item object
-        if( eio.handleHover ){ eio.handleHover( event ); }
+        if( eio.handleHover ){
+          eio.handleHover( event );
+          return;
+        }
         switch( event.type ){
           case 'mouseenter':
             GE.isHoveringAValue = true;
@@ -558,13 +672,11 @@
         break;
       case 'binary':
         value = ( $this.find( '.ge-e-binary-yes' ).length > 0 );
-        // text = value ? '\u274C' : '\u2713';
         if( value ){ text = '\u274C' } else { text = '\u2713'; };
         break;
       case 'step':
         value = $( hoverEvent.target ).closest( 'td' ).index(); // zero based
         text = hoverEvent.target.textContent;
-        // console.log( text );
         break;
       default:
         break;
