@@ -468,7 +468,7 @@
           var headerObject = new GE.evalItemHeader( evaluationCriteria, evalItemDef.id );
           var $theItem = $( headerObject.buildHTML( evalData ) );
           $UIElements.append( $theItem ); 
-          $theItem.data( headerObject );
+          $theItem.data( 'evalItemData', headerObject );
           headerObject.setDOMElementReferences( $theItem );
           break;
         case 'number':
@@ -477,7 +477,7 @@
           evalData.v.width = Math.round( evalData.v.value / evalData.def.topValue * 10000 ) / 100;
           var $theItem = $( numberObject.buildHTML( evalData ) );
           $UIElements.append( $theItem ); 
-          $theItem.data( numberObject );
+          $theItem.data( 'evalItemData', numberObject );
           numberObject.setDOMElementReferences( $theItem );
           break;
         case 'p100':
@@ -486,7 +486,7 @@
           var templateForP100 = _.template( GE.template.evalItemP100 );
 
           var $theItem = $( templateForP100( evalData ) );  // OLD METHOD
-          $theItem.data( {} );
+          $theItem.data( 'evalItemData', {} );
           $UIElements.append( $theItem ); 
 
           break;
@@ -500,7 +500,7 @@
           var templateForBinary = _.template( GE.template.evalItemBinary );
 
           var $theItem = $( templateForBinary( evalData ) );  // OLD METHOD
-          $theItem.data( {} );
+          $theItem.data( 'evalItemData', {} );
           $UIElements.append( $theItem ); 
 
           break;
@@ -508,6 +508,7 @@
           // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
           var stepObject = new GE.evalItemStep( evaluationCriteria, evalItemDef.id );
           var $theItem = $( stepObject.buildHTML( evalData ) );
+          $theItem.data( 'evalItemData', stepObject );
           $UIElements.append( $theItem ); 
           stepObject.setDOMElementReferences( $theItem );
           break;
@@ -516,7 +517,7 @@
           var templateForSpacer = _.template( GE.template.evalItemSpacer );
 
           var $theItem = $( templateForSpacer( evalData ) );  // OLD METHOD
-          $theItem.data( {} );
+          $theItem.data( 'evalItemData', {} );
           $UIElements.append( $theItem ); 
 
           break;
@@ -548,7 +549,7 @@
           return false;
         };
         // for eval items with object, the objetc's handleHover method does the work
-        var eio = $theItem.data(); // eval item object
+        var eio = $theItem.data( 'evalItemData' ); // eval item object
         if( eio.handleHover ){
           eio.handleHover( event );
           return;
