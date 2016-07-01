@@ -124,20 +124,22 @@
     text = hoverEvent.target.textContent;
   };
   GE.evalItemNumber.prototype.handleHover = function( hoverEvent ){
+    var $A = this.$element.$item.find( '.ge-e-value-A' );
+    var leftEdgePosition = $A.offset().left;
+    var valPx = hoverEvent.pageX - leftEdgePosition;
+    var value, text;
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
         this.hoverStartText = this.$element.$display.text();
         this.$element.$display.addClass( 'ge-e-display-hovered' );
-        var $A = this.$element.$item.find( '.ge-e-value-A' );
-        var leftEdgePosition = $A.offset().left;
-        var valPx = hoverEvent.pageX - leftEdgePosition;
         value = Math.round( valPx * this.evalItem.topValue / $A.parent().width());
         text = '' + value;
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
-          GE.calculatePointedValue( this.$element.$item, hoverEvent );
+          value = Math.round( ( valPx * this.evalItem.topValue ) / $A.parent().width() );
+          text = '' + value;
         }
         break;
       case 'mouseleave':
@@ -420,40 +422,37 @@
     '</div>';
 
   //================================================================================
-  GE.template = {};
-
-  GE.template.evalItemHeader_ZZZ =
-    '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-header"><%= u.def.description %></div>';
-
-  GE.template.evalItemNumber_ZZZ =
-    '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-number">' +
-    '  <div class="ge-e-value">' +
-    '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
-    '  </div>' +
-    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
-    '  <input type="text" class="ge-e-display" tabindex="0" title="out of <%= u.def.topValue %>" value=<%= u.v.text %>>' +
-    '</div>';
-
-  GE.template.evalItemP100_ZZZ =
-    '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-p100">' +
-    '  <div class="ge-e-value">' +
-    '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
-    '  </div>' +
-    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
-    '  <input type="text" class="ge-e-display" tabindex="0" value=<%= u.v.text %>>' +
-    '</div>';
-
-  GE.template.evalItemBinary_ZZZ =
-    '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-binary">' +
-    '  <div class="ge-e-value">' +
-    '    <div class="ge-e-binary-<%= (u.v.value ? "yes" : "no") %>">&nbsp;</div>' +
-    '  </div>' +
-    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
-    '  <input type="text" class="ge-e-display" tabindex="0" value=<%= u.v.text %>>' +
-    '</div>';
-
-  GE.template.evalItemSpacer =
+  // Class for spacer-type eval items
+  //
+  //     ####   #####     ##     ####   ######  #####
+  //    #       #    #   #  #   #    #  #       #    #
+  //     ####   #    #  #    #  #       #####   #    #
+  //         #  #####   ######  #       #       #####
+  //    #    #  #       #    #  #    #  #       #   #
+  //     ####   #       #    #   ####   ######  #    #
+  //
+  // 8: { id:'8', type:'spacer' }
+  GE.evalItemSpacer = function( criteria, evalItemId ){
+    this.element = undefined;  // ref to the associated DOM element
+    this.criteria = criteria; 
+    this.evalItemId = evalItemId;
+    this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
+  };
+  GE.evalItemSpacer.prototype.setDOMElementReferences = function( $theItem ){
+    this.$element = {}; // this item's internal elements
+    this.$element.$item = $theItem;
+  };
+  GE.evalItemSpacer.prototype.buildHTML = function( evalData ){
+    if( ! this.template ){
+      this.template = _.template( this.templateSource );
+    };
+    return this.template( evalData );
+  };
+  GE.evalItemSpacer.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-spacer">&nbsp;</div>';
+
+  //================================================================================
+  // Data items:
 
   GE.userGroups = [ {
     groupName: "team",
@@ -532,6 +531,7 @@
 
   GE.currentUser = null; // selected user's file entry
 
+  //================================================================================
   GE.getUserData = function( currentUserId ){
     return _.find( GE.users, function( user ){ return user.id == currentUserId; } );
   };
@@ -670,12 +670,11 @@
           break;
         case 'spacer':
           // 8: { id:'8', type:'spacer' }CX    
-          var templateForSpacer = _.template( GE.template.evalItemSpacer );
-
-          var $theItem = $( templateForSpacer( evalData ) );  // OLD METHOD
-          $theItem.data( 'evalItemData', {} );
+          var spacerObject = new GE.evalItemSpacer( evaluationCriteria, evalItemDef.id );
+          var $theItem = $( spacerObject.buildHTML( evalData ) );
           $UIElements.append( $theItem ); 
-
+          $theItem.data( 'evalItemData', spacerObject );
+          spacerObject.setDOMElementReferences( $theItem );
           break;
         default:
           break;
@@ -687,8 +686,6 @@
     $HTMLTarget.append( $UIElements );
     GE.setEvalItemHoverHandlers();
   };
-
-
 
 
   GE.setEvalItemHoverHandlers = function(){
@@ -704,37 +701,8 @@
           event.stopPropagation;
           return false;
         };
-        // for eval items with object, the objetc's handleHover method does the work
-        var eio = $theItem.data( 'evalItemData' ); // eval item object
-        if( eio.handleHover ){
-          eio.handleHover( event );
-          return;
-        }
-        switch( event.type ){
-          case 'mouseenter':
-            GE.isHoveringAValue = true;
-            GE.hoverStartText = $theDisplay.val();            // TODO: for step items saves all the step names?
-            $theDisplay.addClass( 'ge-e-display-hovered' );
-            GE.calculatePointedValue( $theItem, event );
-            $this.closest( '.ge-e-item' ).find( '.ge-e-name' ).stop().animate( { opacity:0.30 }, 700 );
-            break;
-          case 'mousemove':
-            if( GE.isHoveringAValue ){
-              GE.calculatePointedValue( $theItem, event );
-            }
-            break;
-          case 'mouseleave':
-            $this.closest( '.ge-evaluations').find( '.ge-e-display-hovered' ).removeClass( 'ge-e-display-hovered' );
-            if( GE.isHoveringAValue ){ // if user didn't click then restore initial value
-              $theDisplay.val( GE.hoverStartText );
-            };
-            GE.isHoveringAValue = false;
-            GE.hoverStartText = '';
-            $this.closest( '.ge-e-item' ).find( '.ge-e-name' ).stop().animate( { opacity:1.00 }, 300 );
-            break;
-          default:
-            break;
-        }
+        // the objetc's handleHover method does the work
+        $theItem.data( 'evalItemData' ).handleHover( event );
       }
     );
   };
