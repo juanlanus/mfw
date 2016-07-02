@@ -1,55 +1,6 @@
   // GE is the global object that holds "Edit Goals" data
   var GE = GE || {};
 
-  GE.evalItems = { // definitions of evaluation items for this type of user
-    42: {
-      criteria: 42,  // different employee sets are evaluated with specific criteria
-      description: "Performance of leaders and managers",
-      1: { id:'1', type:'header', description:'First group of eval items' },
-      2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
-      3: { id:'3', type:'p100',   description:'Anthropometric synergic attitude' },
-      4: { id:'4', type:'binary', description:'Is a natural leadership junkie' },
-      5: { id:'5', type:'header', description:'Second group of eval items' },
-      6: { id:'6', type:'binary', description:'Has that success tendency', optional:true },
-      7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
-      8: { id:'8', type:'spacer' }
-    }
-  };
-
-  //================================================================================
-  // Environment:
-  //   GE.evalItems               eval items definitions, by criteria and id
-  //   GE.userGroups              evaluee sets and their selection queries
-  //   GE.evaluations             the evaluations data file, indexed by user id
-  //   GE.currentUserEvals        last two evaluations for the current user
-  //   GE.emptyEvaluation         generated empty evals, indexed by eval criteria
-  //   GE.currentUser             selected evaluee file entry
-  //   GE.getUserData(id)         return the user file entry with id == id
-  //   GE.buildNewEvaluation(c)   build an empty evaluation with criteria c
-  //   GE.getCurrentUserEvals(i)  load GE.currentUserEvals with an attitude
-  //   GE.putCurrentUserEvals()   store GE.currentUserEvals in file TODO
-  //   GE.getEvalItemValue(id)    get values for the current eval with id == id
-  // * GE.evalItemsBuild($t,c)    build the evals UI for user displayed in $t
-  //
-  // * GE.setEvalItemHoverHandlers()
-  //   GE.selectUsers( groupId, usersAlreadyListed )
-  //   GE.setEvalValue( $evalItem, value, text )
-  //   GE.getDisplayElement( $evalItem )
-  //   GE.setDisplayText( $evalItem, displayText )
-  //   GE.processKBInput( $e )
-  //   GE.getItemDefs( $this )
-  // * GE.calculatePointedValue( $this, hoverEvent )
-  //   GE.handleNumEvalClick( $this, $e, event )
-  // * GE.handleEvalClick( $e, event )
-  // * GE.buildStepItemUI($t,d)   build quicksearch artifact for step-type eval
-  //                              items and set kb evant handlers
-  // * GE.setEvalItemKBHandler($t,d) set kb action handlers for all eval item types
-  //   GE.resetEvalItemKBHandler( $eventTarget )
-  //   GE.isDigit(x)              return true if x is a digit 
-  //   GE.selectElementText(e)    select element's text on kb focus (automatic for <input>)
-  //   GE.beep()                  make a brief complain sound
-  //   $()                        set focus handlers
-  //
   //================================================================================
   // Class for header-type eval items
   //
@@ -62,23 +13,28 @@
   //
   // 1: { id:'1', type:'header', description:'First group of eval items' },
   // <div id="ge-e-item-1" class="ge-e-item ge-e-header">First group of eval items</div>
-  GE.evalItemHeader = function( criteria, evalItemId ){
+  GE.EvalItemHeader = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
   };
-  GE.evalItemHeader.prototype.setDOMElementReferences = function( $theItem ){
+  GE.EvalItemHeader.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
   };
-  GE.evalItemHeader.prototype.buildHTML = function( evalData ){
+  // click on the value bar to set a new value
+  GE.EvalItemHeader.prototype.handleClick = function( hoverEvent ){
+    beep();
+    return false;
+  };
+  GE.EvalItemHeader.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
     return this.template( evalData );
   };
-  GE.evalItemHeader.prototype.templateSource = 
+  GE.EvalItemHeader.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-header"><%= u.def.description %></div>';
 
   //================================================================================
@@ -101,29 +57,37 @@
       <input type="text" class="ge-e-display" tabindex="0" value="">
     </div>
   */
-  GE.evalItemNumber = function( criteria, evalItemId ){
+  GE.EvalItemNumber = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
   };
-  GE.evalItemNumber.prototype.setDOMElementReferences = function( $theItem ){
+  GE.EvalItemNumber.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
     this.$element.$value = $theItem.find( '.ge-e-value' );
     this.$element.$display = $theItem.find( '.ge-e-display' );
     this.$element.$name = $theItem.find( '.ge-e-name' );
   };
+  // click on the value bar to set a new value
+  GE.EvalItemNumber.prototype.handleClick = function( hoverEvent ){
+    beep();
+    return false;
+  };
   // text content of the $display element
-  GE.evalItemNumber.prototype.text = function(){
+  GE.EvalItemNumber.prototype.text = function(){
     return this.hasValue ? this.evalItem.steps[ this.value ] : '';
   };
+  GE.EvalItemNumber.prototype.showText = function( text ){
+    this.$element.$display.val( text ); 
+  };
   // value pointed to by mouse during hover
-  GE.evalItemNumber.calculatePointedValue = function( hoverEvent ){
+  GE.EvalItemNumber.calculatePointedValue = function( hoverEvent ){
     value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
     text = hoverEvent.target.textContent;
   };
-  GE.evalItemNumber.prototype.handleHover = function( hoverEvent ){
+  GE.EvalItemNumber.prototype.handleHover = function( hoverEvent ){
     var $A = this.$element.$item.find( '.ge-e-value-A' );
     var leftEdgePosition = $A.offset().left;
     var valPx = hoverEvent.pageX - leftEdgePosition;
@@ -131,20 +95,20 @@
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
-        this.hoverStartText = this.$element.$display.text();
+        this.hoverStartText = this.$element.$display.val();
         this.$element.$display.addClass( 'ge-e-display-hovered' );
         value = Math.round( valPx * this.evalItem.topValue / $A.parent().width());
-        text = '' + value;
+        this.showText( '' + value );
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
           value = Math.round( ( valPx * this.evalItem.topValue ) / $A.parent().width() );
-          text = '' + value;
+          this.showText( '' + value );
         }
         break;
       case 'mouseleave':
         if( this.isHoveringAValue ){
-          text = this.hoverStartText;
+          this.showText( this.hoverStartText );
         }
         this.isHoveringAValue = false;
         this.hoverStartText = null;
@@ -160,13 +124,13 @@
     }
   };
 
-  GE.evalItemNumber.prototype.buildHTML = function( evalData ){
+  GE.EvalItemNumber.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
     return this.template( evalData );
   };
-  GE.evalItemNumber.prototype.templateSource = 
+  GE.EvalItemNumber.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-number">' +
     '  <div class="ge-e-value">' +
     '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
@@ -187,43 +151,52 @@
   //   #       #####    ###     ###
   // 
   // 3: { id:'3', type:'p100',   description:'Anthropometric synergic attitude' },
-  GE.evalItemP100 = function( criteria, evalItemId ){
+  GE.EvalItemP100 = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
   };
-  GE.evalItemP100.prototype.setDOMElementReferences = function( $theItem ){
+  GE.EvalItemP100.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
     this.$element.$value = $theItem.find( '.ge-e-value' );
     this.$element.$display = $theItem.find( '.ge-e-display' );
     this.$element.$name = $theItem.find( '.ge-e-name' );
   };
+  // click on the value bar to set a new value
+  GE.EvalItemP100.prototype.handleClick = function( hoverEvent ){
+    beep();
+    return false;
+  };
   // text content of the $display element
-  GE.evalItemP100.prototype.text = function(){
+  GE.EvalItemP100.prototype.text = function(){
     return this.hasValue ? this.value + '%' : '';
   };
+  GE.EvalItemP100.prototype.showText = function( text ){
+    this.$element.$display.val( text ); 
+  };
   // value pointed to by mouse during hover
-  GE.evalItemP100.calculatePointedValue = function( hoverEvent ){
+  GE.EvalItemP100.calculatePointedValue = function( hoverEvent ){
     value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
     text = hoverEvent.target.textContent;
   };
-  GE.evalItemP100.prototype.handleHover = function( hoverEvent ){
+  GE.EvalItemP100.prototype.handleHover = function( hoverEvent ){
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
-        this.hoverStartText = this.$element.$display.text();
+        this.hoverStartText = this.$element.$display.val();
         this.$element.$display.addClass( 'ge-e-display-hovered' );
         var $A = this.$element.$item.find( '.ge-e-value-A' );
         var leftEdgePosition = $A.offset().left;
         var valPx = hoverEvent.pageX - leftEdgePosition;
         value = Math.round( valPx * 100 / $A.parent().width());
-        text = '' + value + '%';
+        this.showText( '' + value + '%' );
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
           GE.calculatePointedValue( this.$element.$item, hoverEvent );
+          this.showText( '' + value );
         }
         break;
       case 'mouseleave':
@@ -231,7 +204,7 @@
         this.hoverStartText = null;
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
         if( this.isHoveringAValue ){ // if user didn't click then restore initial value
-          this.$element.$display.val( GE.hoverStartText );
+          this.showText( GE.hoverStartText );
         };
         this.isHoveringAValue = false;
         this.hoverStartText = '';
@@ -241,13 +214,13 @@
     }
   };
 
-  GE.evalItemP100.prototype.buildHTML = function( evalData ){
+  GE.EvalItemP100.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
     return this.template( evalData );
   };
-  GE.evalItemP100.prototype.templateSource = 
+  GE.EvalItemP100.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-p100">' +
     '  <div class="ge-e-value">' +
     '    <div class="ge-e-value-A" style="width:<%= u.v.width %>%;">&nbsp;</div>' +
@@ -267,36 +240,44 @@
   //   #####      #    #    #  #    #  #    #     #
   // 
   // 4: { id:'4', type:'binary', description:'Is a natural leadership junkie' },
-  GE.evalItemBinary = function( criteria, evalItemId ){
+  GE.EvalItemBinary = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
   };
-  GE.evalItemBinary.prototype.setDOMElementReferences = function( $theItem ){
+  GE.EvalItemBinary.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
     this.$element.$value = $theItem.find( '.ge-e-value' );
     this.$element.$display = $theItem.find( '.ge-e-display' );
     this.$element.$name = $theItem.find( '.ge-e-name' );
   };
+  // click on the value bar to set a new value
+  GE.EvalItemBinary.prototype.handleClick = function( hoverEvent ){
+    beep();
+    return false;
+  };
   // text content of the $display element
-  GE.evalItemBinary.prototype.text = function(){
+  GE.EvalItemBinary.prototype.text = function(){
     if( this.hasValue ){
       return( this.value ? '\u274C' : '\u2713' ); // ✓ &#x274c; ❌ &#x2713 );
     } else {
       return '';
     }
   };
+  GE.EvalItemBinary.prototype.showText = function( text ){
+    this.$element.$display.val( text ); 
+  };
   // value to be set on click, during hover
-  GE.evalItemBinary.calculatePointedValue = function( hoverEvent ){
+  GE.EvalItemBinary.calculatePointedValue = function( hoverEvent ){
     if( this.value ){ return '\u274C' } else { return '\u2713'; };
   };
-  GE.evalItemBinary.prototype.handleHover = function( hoverEvent ){
+  GE.EvalItemBinary.prototype.handleHover = function( hoverEvent ){
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
-        this.hoverStartText = this.$element.$display.text();
+        this.hoverStartText = this.$element.$display.val();
         this.$element.$display.addClass( 'ge-e-display-hovered' );
         break;
       case 'mousemove':
@@ -305,27 +286,23 @@
         }
         break;
       case 'mouseleave':
-        this.isHoveringAValue = false;
-        this.hoverStartText = null;
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
         if( this.isHoveringAValue ){ // if user didn't click then restore initial value
-          this.$element.$display.val( GE.hoverStartText );
+          this.showText( GE.hoverStartText );
         };
         this.isHoveringAValue = false;
         this.hoverStartText = '';
         break;
-      default:
-        break;
     }
   };
 
-  GE.evalItemBinary.prototype.buildHTML = function( evalData ){
+  GE.EvalItemBinary.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
     return this.template( evalData );
   };
-  GE.evalItemBinary.prototype.templateSource = 
+  GE.EvalItemBinary.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-binary">' +
     '  <div class="ge-e-value">' +
     '    <div class="ge-e-binary-<%= (u.v.value ? "yes" : "no") %>">&nbsp;</div>' +
@@ -345,7 +322,7 @@
   //    ####      #    ######  #
   //
   // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
-  GE.evalItemStep = function( criteria, evalItemId ){
+  GE.EvalItemStep = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associate DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
@@ -353,7 +330,7 @@
     this.hasValue = undefined;
     this.value = undefined;
   };
-  GE.evalItemStep.prototype.setDOMElementReferences = function( $theItem ){
+  GE.EvalItemStep.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
     this.$element.$value = $theItem.find( '.ge-e-value' );
@@ -361,18 +338,33 @@
     this.$element.$name = $theItem.find( '.ge-e-name' );
   };
   // text content of the $display element
-  GE.evalItemStep.prototype.text = function(){
+  GE.EvalItemStep.prototype.text = function(){
     return this.hasValue ? this.evalItem.steps[ this.value ] : '';
   };
+  // click on the value bar to set a new value
+  GE.EvalItemStep.prototype.handleClick = function( hoverEvent ){
+    this.isHoveringAValue = false;
+    this.$element.$display.removeClass( 'ge-e-display-hovered' );
+    // branch is click was in value display (kb input)
+    if( $( hoverEvent.target ).hasClass( 'ge-e-display' ) ){
+      beep()
+      return false;
+    };
+
+
+  }
   // value (step) pointed to by mouse during hover
-  GE.evalItemStep.calculatePointedValue = function( hoverEvent ){
+  GE.EvalItemStep.calculatePointedValue = function( hoverEvent ){
     value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
     text = hoverEvent.target.textContent;
   };
-  GE.evalItemStep.prototype.handleHover = function( hoverEvent ){
+  GE.EvalItemStep.prototype.handleHover = function( hoverEvent ){
+    if( hoverEvent.target.tagName !== 'TD' ) {
+      hoverEvent.stopPropagation;
+    }
     var $this = $( event.target );
     var $theItem = $this.closest( '.ge-e-item' ); // has a class per item type
-    var $theDisplay = GE.getDisplayElement( $theItem );
+    var $theDisplay = this.$element.$display( $theItem );
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
@@ -399,7 +391,7 @@
         break;
     }
   };
-  GE.evalItemStep.prototype.buildHTML = function( evalData ){
+  GE.EvalItemStep.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
@@ -408,7 +400,7 @@
     evalData.v = GE.getEvalItemValue( this.evalItemId ); // { value:..., text:..., hasValue:... }
     return this.template( evalData );
   };
-  GE.evalItemStep.prototype.templateSource = 
+  GE.EvalItemStep.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-step">' +
     '  <div class="ge-e-value">' +
     '    <table><tbody>' +
@@ -435,27 +427,47 @@
   //     ####   #       #    #   ####   ######  #    #
   //
   // 8: { id:'8', type:'spacer' }
-  GE.evalItemSpacer = function( criteria, evalItemId ){
+  GE.EvalItemSpacer = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
   };
-  GE.evalItemSpacer.prototype.setDOMElementReferences = function( $theItem ){
+  GE.EvalItemSpacer.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
   };
-  GE.evalItemSpacer.prototype.buildHTML = function( evalData ){
+  // click on the value bar to set a new value
+  GE.EvalItemSpacer.prototype.handleClick = function( hoverEvent ){
+    beep();
+    return false;
+  };
+  GE.EvalItemSpacer.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
     return this.template( evalData );
   };
-  GE.evalItemSpacer.prototype.templateSource = 
+  GE.EvalItemSpacer.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-spacer">&nbsp;</div>';
 
   //================================================================================
   // Data items:
+
+  GE.evalItems = { // definitions of evaluation items for this type of user
+    42: {
+      criteria: 42,  // different employee sets are evaluated with specific criteria
+      description: "Performance of leaders and managers",
+      1: { id:'1', type:'header', description:'First group of eval items' },
+      2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
+      3: { id:'3', type:'p100',   description:'Anthropometric synergic attitude' },
+      4: { id:'4', type:'binary', description:'Is a natural leadership junkie' },
+      5: { id:'5', type:'header', description:'Second group of eval items' },
+      6: { id:'6', type:'binary', description:'Has that success tendency', optional:true },
+      7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
+      8: { id:'8', type:'spacer' }
+    }
+  };
 
   GE.userGroups = [ {
     groupName: "team",
@@ -615,7 +627,16 @@
   };
 
   GE.evalItemsBuild = function( $clickTarget, evaluationCriteria ){
-    // build the eval items set UI for the clicked user
+    // TODO: remove the previous eval items set
+    // build the eval items set UI for the clicked user, and an object for each item
+    function doEvalItemBuild( evalItemClass, evaluationCriteria, evalData ){
+      // common operations for all eval item types
+      var evalItemObject = new evalItemClass( evaluationCriteria, evalData.def.id );
+      var $theItem = $( evalItemObject.buildHTML( evalData ) );
+      $UIElements.append( $theItem ); 
+      $theItem.data( 'evalItemData', evalItemObject );
+      evalItemObject.setDOMElementReferences( $theItem );
+    };
     GE.currentUserEvals = GE.getCurrentUserEvals( GE.currentUser.id, GE.currentUser.evaluationCriteria );
     var $UIElements = $( '<div/>' ); // the eval items UI elements
     _.each(
@@ -626,58 +647,34 @@
         switch( evalItemDef.type ){
         case 'header':
           // 1: { id:'1', type:'header', description:'First group of eval items' },
-          var headerObject = new GE.evalItemHeader( evaluationCriteria, evalItemDef.id );
-          var $theItem = $( headerObject.buildHTML( evalData ) );
-          $UIElements.append( $theItem ); 
-          $theItem.data( 'evalItemData', headerObject );
-          headerObject.setDOMElementReferences( $theItem );
+          doEvalItemBuild( GE.EvalItemHeader, evaluationCriteria, evalData );
           break;
         case 'number':
           // 2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
-          var numberObject = new GE.evalItemNumber( evaluationCriteria, evalItemDef.id );
           evalData.v.width = Math.round( evalData.v.value / evalData.def.topValue * 10000 ) / 100;
-          var $theItem = $( numberObject.buildHTML( evalData ) );
-          $UIElements.append( $theItem ); 
-          $theItem.data( 'evalItemData', numberObject );
-          numberObject.setDOMElementReferences( $theItem );
+          doEvalItemBuild( GE.EvalItemNumber, evaluationCriteria, evalData );
           break;
         case 'p100':
           // 3: { id:'3', type:'p100',   description:'Anthropometric synergic attitude' },
-          var p100Object = new GE.evalItemP100( evaluationCriteria, evalItemDef.id );
           evalData.v.width = evalData.v.value;
-          var $theItem = $( p100Object.buildHTML( evalData ) );
-          $UIElements.append( $theItem ); 
-          $theItem.data( 'evalItemData', p100Object );
-          p100Object.setDOMElementReferences( $theItem );
+          doEvalItemBuild( GE.EvalItemP100, evaluationCriteria, evalData );
           break;
         case 'binary':
           // 6: { id:'6', type:'binary', description:'Has that success tendency' },
-          var binaryObject = new GE.evalItemBinary( evaluationCriteria, evalItemDef.id );
           if( evalData.v.hasValue ){
             evalData.v.text = evalData.v.value ? '\u274C' : '\u2713'; // ✓ &#x274c; ❌ &#x2713;
           } else {
             evalData.v.text = '';
           }
-          var $theItem = $( binaryObject.buildHTML( evalData ) );
-          $UIElements.append( $theItem ); 
-          $theItem.data( 'evalItemData', binaryObject );
-          binaryObject.setDOMElementReferences( $theItem );
+          doEvalItemBuild( GE.EvalItemBinary, evaluationCriteria, evalData );
           break;
         case 'step':
           // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
-          var stepObject = new GE.evalItemStep( evaluationCriteria, evalItemDef.id );
-          var $theItem = $( stepObject.buildHTML( evalData ) );
-          $theItem.data( 'evalItemData', stepObject );
-          $UIElements.append( $theItem ); 
-          stepObject.setDOMElementReferences( $theItem );
+          doEvalItemBuild( GE.EvalItemStep, evaluationCriteria, evalData );
           break;
         case 'spacer':
           // 8: { id:'8', type:'spacer' }CX    
-          var spacerObject = new GE.evalItemSpacer( evaluationCriteria, evalItemDef.id );
-          var $theItem = $( spacerObject.buildHTML( evalData ) );
-          $UIElements.append( $theItem ); 
-          $theItem.data( 'evalItemData', spacerObject );
-          spacerObject.setDOMElementReferences( $theItem );
+          doEvalItemBuild( GE.EvalItemSpacer, evaluationCriteria, evalData );
           break;
         default:
           break;
@@ -690,21 +687,12 @@
     GE.setEvalItemHoverHandlers();
   };
 
-
   GE.setEvalItemHoverHandlers = function(){
-    // when hovering the value bar, show the value associated with the pointer's position
-    // TODO: doesn't work with generated HTML, set to container and drill down
+    // when hovering an eval item, show the value associated with the pointer's position
     $( '.ge-e-value' ).on(
       'mouseenter.eihh mousemove.eihh mouseleave.eihh',
       function( event ){
-        var $this = $( event.target );
-        var $theItem = $this.closest( '.ge-e-item' ); // has a class per item type
-        var $theDisplay = GE.getDisplayElement( $theItem );
-        if( $theItem.hasClass( 'ge-e-step' ) && event.target.nodeName !== 'TD' ){ 
-          event.stopPropagation;
-          return false;
-        };
-        // the objetc's handleHover method does the work
+        var $theItem = $( event.target ).closest( '.ge-e-item' );
         $theItem.data( 'evalItemData' ).handleHover( event );
       }
     );
