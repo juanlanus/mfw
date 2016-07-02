@@ -143,6 +143,9 @@
         }
         break;
       case 'mouseleave':
+        if( this.isHoveringAValue ){
+          text = this.hoverStartText;
+        }
         this.isHoveringAValue = false;
         this.hoverStartText = null;
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
