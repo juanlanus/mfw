@@ -48,15 +48,6 @@
   //   #    #   ####   #    #  #####   ######  #    #
   //
   // 2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
-  /*
-    <div id="ge-e-item-3" class="ge-e-item ge-e-p100">
-      <div class="ge-e-value">
-        <div class="ge-e-value-A" style="width: 78.8235%;">&nbsp;</div>
-      </div>
-      <div class="ge-e-name" style="opacity: 1;">Anthropometric synergic attitude</div>
-      <input type="text" class="ge-e-display" tabindex="0" value="">
-    </div>
-  */
   GE.EvalItemNumber = function( criteria, evalItemId ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
@@ -83,43 +74,31 @@
     this.$element.$display.val( text ); 
   };
   // value pointed to by mouse during hover
-  GE.EvalItemNumber.calculatePointedValue = function( hoverEvent ){
-    value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
-    text = hoverEvent.target.textContent;
+  GE.EvalItemNumber.prototype.calculateValue = function( hoverEvent ){
+    var $A = this.$element.$item.find( '.ge-e-value-A' );
+    var valPx = hoverEvent.pageX - $A.offset().left;
+    return Math.round( valPx * this.evalItem.topValue / $A.parent().width() );
   };
   GE.EvalItemNumber.prototype.handleHover = function( hoverEvent ){
-    var $A = this.$element.$item.find( '.ge-e-value-A' );
-    var leftEdgePosition = $A.offset().left;
-    var valPx = hoverEvent.pageX - leftEdgePosition;
-    var value, text;
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
         this.hoverStartText = this.$element.$display.val();
         this.$element.$display.addClass( 'ge-e-display-hovered' );
-        value = Math.round( valPx * this.evalItem.topValue / $A.parent().width());
-        this.showText( '' + value );
+        this.showText( '' + this.calculateValue( hoverEvent ) );
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
-          value = Math.round( ( valPx * this.evalItem.topValue ) / $A.parent().width() );
-          this.showText( '' + value );
+          this.showText( '' + this.calculateValue( hoverEvent ) );
         }
         break;
       case 'mouseleave':
-        if( this.isHoveringAValue ){
-          this.showText( this.hoverStartText );
-        }
+        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
+          this.$element.$display.val( this.hoverStartText );
+        };
         this.isHoveringAValue = false;
         this.hoverStartText = null;
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
-        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
-          this.$element.$display.val( GE.hoverStartText );
-        };
-        this.isHoveringAValue = false;
-        this.hoverStartText = '';
-        break;
-      default:
         break;
     }
   };
@@ -177,9 +156,10 @@
     this.$element.$display.val( text ); 
   };
   // value pointed to by mouse during hover
-  GE.EvalItemP100.calculatePointedValue = function( hoverEvent ){
-    value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
-    text = hoverEvent.target.textContent;
+  GE.EvalItemP100.prototype.calculateValue = function( hoverEvent ){
+    var $A = this.$element.$item.find( '.ge-e-value-A' );
+    var valPx = hoverEvent.pageX - $A.offset().left;
+    return Math.round( valPx * 100 / this.$element.$value.width());
   };
   GE.EvalItemP100.prototype.handleHover = function( hoverEvent ){
     switch( hoverEvent.type ){
@@ -187,29 +167,20 @@
         this.isHoveringAValue = true;
         this.hoverStartText = this.$element.$display.val();
         this.$element.$display.addClass( 'ge-e-display-hovered' );
-        var $A = this.$element.$item.find( '.ge-e-value-A' );
-        var leftEdgePosition = $A.offset().left;
-        var valPx = hoverEvent.pageX - leftEdgePosition;
-        value = Math.round( valPx * 100 / $A.parent().width());
-        this.showText( '' + value + '%' );
+        this.showText( '' + this.calculateValue( hoverEvent ) + '%' );
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
-          GE.calculatePointedValue( this.$element.$item, hoverEvent );
-          this.showText( '' + value );
+          this.showText( '' + this.calculateValue( hoverEvent ) + '%' );
         }
         break;
       case 'mouseleave':
+        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
+          this.$element.$display.val( this.hoverStartText );
+        };
         this.isHoveringAValue = false;
         this.hoverStartText = null;
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
-        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
-          this.showText( GE.hoverStartText );
-        };
-        this.isHoveringAValue = false;
-        this.hoverStartText = '';
-        break;
-      default:
         break;
     }
   };
@@ -282,13 +253,13 @@
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
-          GE.calculatePointedValue( this.$element.$item, hoverEvent );
+          GE.EvalItemBinary.calculatePointedValue( this.$element.$item, hoverEvent );
         }
         break;
       case 'mouseleave':
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
         if( this.isHoveringAValue ){ // if user didn't click then restore initial value
-          this.showText( GE.hoverStartText );
+          this.showText( this.hoverStartText );
         };
         this.isHoveringAValue = false;
         this.hoverStartText = '';
@@ -349,10 +320,11 @@
     if( $( hoverEvent.target ).hasClass( 'ge-e-display' ) ){
       beep()
       return false;
-    };
-
-
-  }
+    }
+  };
+  GE.EvalItemStep.prototype.showText = function( text ){
+    this.$element.$display.val( text ); 
+  };
   // value (step) pointed to by mouse during hover
   GE.EvalItemStep.calculatePointedValue = function( hoverEvent ){
     value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
@@ -362,32 +334,28 @@
     if( hoverEvent.target.tagName !== 'TD' ) {
       hoverEvent.stopPropagation;
     }
-    var $this = $( event.target );
-    var $theItem = $this.closest( '.ge-e-item' ); // has a class per item type
-    var $theDisplay = this.$element.$display( $theItem );
     switch( hoverEvent.type ){
       case 'mouseenter':
         this.isHoveringAValue = true;
-        this.hoverStartText = this.value;
-        this.$element.$item.addClass( 'ge-e-display-hovered' );
-        GE.calculatePointedValue( $theItem, hoverEvent );
+        this.hoverStartText = this.$element.$display.val();
         this.$element.$name.stop().animate( { opacity:0.30 }, 700 );
+        this.$element.$display.addClass( 'ge-e-display-hovered' );
+        this.showText( $( hoverEvent.target ).text() );
+        GE.EvalItemStep.calculatePointedValue( this.$element.$item, hoverEvent );
         break;
       case 'mousemove':
-        if( GE.isHoveringAValue ){
-          GE.calculatePointedValue( $theItem, hoverEvent );
+        if( this.isHoveringAValue ){
+          this.showText( $( hoverEvent.target ).text() );
         }
         break;
       case 'mouseleave':
-        $this.closest( '.ge-evaluations').find( '.ge-e-display-hovered' ).removeClass( 'ge-e-display-hovered' );
-        if( GE.isHoveringAValue ){ // if user didn't click then restore initial value
-          $theDisplay.val( GE.hoverStartText );
+        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
+          this.$element.$display.val( this.hoverStartText );
         };
-        GE.isHoveringAValue = false;
-        GE.hoverStartText = '';
-        $this.closest( '.ge-e-item' ).find( '.ge-e-name' ).stop().animate( { opacity:1.00 }, 300 );
-        break;
-      default:
+        this.isHoveringAValue = false;
+        this.hoverStartText = '';
+        this.$element.$display.removeClass( 'ge-e-display-hovered' );
+        this.$element.$name.stop().animate( { opacity:1.00 }, 300 );
         break;
     }
   };
@@ -719,7 +687,7 @@
   };
 
   GE.setEvalValue = function( $evalItem, value, text ){
-  // saves the evaluation value in the display element's data
+    // TODO: stored data never used, must store in the eval item's object
     var theId = $evalItem.closest( '.ge-e-item' )[0].id.replace( 'ge-e-item-', '' ); // 123 of ge-e-item-123
     $evalItem.data( 'eval', { id:theId, value:value, text:text } );
     console.log( 'stored for id:' + theId + ' value:' + value + ' text:' + text );
@@ -742,9 +710,10 @@
 
   GE.getItemDefs = function( $this ){
   // return the eval item type, or null if not an evaluatable item
+    // TODO: the def is references in the item's object, this function not needed
     var $item = $this.closest( '.ge-e-item' );
     if( ! $item.length ){ return null; } // arg was not an eval item
-    if( $item.hasClass( 'ge-e-spaces ge-e-header' ) ){ return null; }
+    if( $item.hasClass( 'ge-e-spacer ge-e-header' ) ){ return null; }
     var theId = $item[0].id.replace( 'ge-e-item-', '' ); // 123 of ge-e-item-123
     // TODO: the evaluationCriteria thing is wrong: it must be the evaluation's, not the evaluee's
     var theEvalItem = GE.evalItems[ GE.currentUser.evaluationCriteria ][ theId ]; 
@@ -752,6 +721,7 @@
   };
 
   GE.calculatePointedValue = function( $this, hoverEvent ){
+  // TODO: not used any ore, SPS?
   // returns value and text correponding to the current pointer position 
   // on a hovered item thus  { value:foo, text:'bar' }
     var itemDefs = GE.getItemDefs( $this );
@@ -810,7 +780,6 @@
   };
 
   GE.handleEvalClick = function( $e, event ){
-    GE.isHoveringAValue = false;
     GE.getDisplayElement( $e ).removeClass( 'ge-e-display-hovered' );
     var $this = $e.closest( '.ge-e-item' );
     console.log( 'handling evaluation item input for ' + $this.attr( 'class' ) );
