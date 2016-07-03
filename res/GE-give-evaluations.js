@@ -24,9 +24,7 @@
     this.$element.$item = $theItem;
   };
   // click on the value bar to set a new value
-  GE.EvalItemHeader.prototype.handleClick = function( hoverEvent ){
-    beep();
-    return false;
+  GE.EvalItemHeader.prototype.handleClick = function( clickEvent ){
   };
   GE.EvalItemHeader.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
@@ -48,23 +46,21 @@
   //   #    #   ####   #    #  #####   ######  #    #
   //
   // 2: { id:'2', type:'number', description:'Positive idiosyncrasy', topValue:'3000' },
-  GE.EvalItemNumber = function( criteria, evalItemId ){
+  GE.EvalItemNumber = function( criteria, evalItemId, value ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
+    this.eval = {}; // evaluation values
+    this.eval = $.extend( this.eval, value || {} )
   };
   GE.EvalItemNumber.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
+    this.element = $theItem[0];
     this.$element.$value = $theItem.find( '.ge-e-value' );
     this.$element.$display = $theItem.find( '.ge-e-display' );
     this.$element.$name = $theItem.find( '.ge-e-name' );
-  };
-  // click on the value bar to set a new value
-  GE.EvalItemNumber.prototype.handleClick = function( hoverEvent ){
-    beep();
-    return false;
   };
   // text content of the $display element
   GE.EvalItemNumber.prototype.text = function(){
@@ -102,6 +98,17 @@
         break;
     }
   };
+  // click on the value bar to set a new value
+  GE.EvalItemNumber.prototype.handleClick = function( clickEvent ){
+    var $A = this.$element.$item.find( '.ge-e-value-A' );
+    // compute valPx proportional to value and resize bar
+    var valPx = clickEvent.pageX - $A.offset().left;
+    $A.animate( { width: ( valPx / $A.parent().width() * 100 ) + '%' } );
+    // compute value proportional to pointer position
+    this.eval.value = Math.round( valPx * this.evalItem.topValue / $A.parent().width() );
+    this.eval.text = '' + this.eval.value;
+    this.showText( this.eval.text );
+  };
 
   GE.EvalItemNumber.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
@@ -130,11 +137,13 @@
   //   #       #####    ###     ###
   // 
   // 3: { id:'3', type:'p100',   description:'Anthropometric synergic attitude' },
-  GE.EvalItemP100 = function( criteria, evalItemId ){
+  GE.EvalItemP100 = function( criteria, evalItemId, value ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
+    this.eval = {}; // evaluation values
+    this.eval = $.extend( this.eval, value || {} )
   };
   GE.EvalItemP100.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
@@ -142,11 +151,6 @@
     this.$element.$value = $theItem.find( '.ge-e-value' );
     this.$element.$display = $theItem.find( '.ge-e-display' );
     this.$element.$name = $theItem.find( '.ge-e-name' );
-  };
-  // click on the value bar to set a new value
-  GE.EvalItemP100.prototype.handleClick = function( hoverEvent ){
-    beep();
-    return false;
   };
   // text content of the $display element
   GE.EvalItemP100.prototype.text = function(){
@@ -185,6 +189,18 @@
     }
   };
 
+  // click on the value bar to set a new value
+  GE.EvalItemP100.prototype.handleClick = function( clickEvent ){
+    var $A = this.$element.$item.find( '.ge-e-value-A' );
+    // compute valPx proportional to value and resize bar
+    var valPx = clickEvent.pageX - $A.offset().left;
+    $A.animate( { width: ( valPx / $A.parent().width() * 100 ) + '%' } );
+    // compute value proportional to pointer position
+    this.eval.value = Math.round( valPx * 100 / $A.parent().width() );
+    this.eval.text = '' + this.eval.value + '%';
+    this.showText( this.eval.text );
+  };
+
   GE.EvalItemP100.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
@@ -211,11 +227,13 @@
   //   #####      #    #    #  #    #  #    #     #
   // 
   // 4: { id:'4', type:'binary', description:'Is a natural leadership junkie' },
-  GE.EvalItemBinary = function( criteria, evalItemId ){
+  GE.EvalItemBinary = function( criteria, evalItemId, value ){
     this.element = undefined;  // ref to the associated DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
+    this.eval = {}; // evaluation values
+    this.eval = $.extend( this.eval, value || {} )
   };
   GE.EvalItemBinary.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
@@ -224,11 +242,7 @@
     this.$element.$display = $theItem.find( '.ge-e-display' );
     this.$element.$name = $theItem.find( '.ge-e-name' );
   };
-  // click on the value bar to set a new value
-  GE.EvalItemBinary.prototype.handleClick = function( hoverEvent ){
-    beep();
-    return false;
-  };
+
   // text content of the $display element
   GE.EvalItemBinary.prototype.text = function(){
     if( this.hasValue ){
@@ -260,11 +274,26 @@
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
         if( this.isHoveringAValue ){ // if user didn't click then restore initial value
           this.showText( this.hoverStartText );
+          this.isHoveringAValue = false;
         };
-        this.isHoveringAValue = false;
         this.hoverStartText = '';
         break;
     }
+  };
+
+  // click on the value bar to set a new value
+  GE.EvalItemBinary.prototype.handleClick = function( clickEvent ){
+    var $z = this.$element.$value.find( 'div' );
+    if( $z.hasClass( 'ge-e-binary-yes' ) ){ // value is true
+      this.eval.value = false; // so set to false
+      $z.removeClass( 'ge-e-binary-yes' ).addClass( 'ge-e-binary-no' );
+      this.eval.text = '\u274C'; // ❌
+    } else {
+      this.eval.value = true;
+      $z.removeClass( 'ge-e-binary-no' ).addClass( 'ge-e-binary-yes' );
+      this.eval.text = '\u2713'; // ✓
+    }
+    this.showText( this.eval.text );
   };
 
   GE.EvalItemBinary.prototype.buildHTML = function( evalData ){
@@ -293,13 +322,15 @@
   //    ####      #    ######  #
   //
   // 7: { id:'7', type:'step',   description:'Advise acceptance', steps:['awful', 'low', 'regular', 'high', 'impressing'] },
-  GE.EvalItemStep = function( criteria, evalItemId ){
+  GE.EvalItemStep = function( criteria, evalItemId, value ){
     this.element = undefined;  // ref to the associate DOM element
     this.criteria = criteria; 
     this.evalItemId = evalItemId;
     this.evalItem = GE.evalItems[ criteria ][ evalItemId ];
     this.hasValue = undefined;
     this.value = undefined;
+    this.eval = {}; // evaluation values
+    this.eval = $.extend( this.eval, value || {} )
   };
   GE.EvalItemStep.prototype.setDOMElementReferences = function( $theItem ){
     this.$element = {}; // this item's internal elements
@@ -312,16 +343,6 @@
   GE.EvalItemStep.prototype.text = function(){
     return this.hasValue ? this.evalItem.steps[ this.value ] : '';
   };
-  // click on the value bar to set a new value
-  GE.EvalItemStep.prototype.handleClick = function( hoverEvent ){
-    this.isHoveringAValue = false;
-    this.$element.$display.removeClass( 'ge-e-display-hovered' );
-    // branch is click was in value display (kb input)
-    if( $( hoverEvent.target ).hasClass( 'ge-e-display' ) ){
-      beep()
-      return false;
-    }
-  };
   GE.EvalItemStep.prototype.showText = function( text ){
     this.$element.$display.val( text ); 
   };
@@ -330,35 +351,47 @@
     value = $( hoverEvent.target ).closest( 'td' ).index() + 1;
     text = hoverEvent.target.textContent;
   };
+
   GE.EvalItemStep.prototype.handleHover = function( hoverEvent ){
     if( hoverEvent.target.tagName !== 'TD' ) {
-      hoverEvent.stopPropagation;
+      hoverEvent.stopPropagation();
     }
     switch( hoverEvent.type ){
-      case 'mouseenter':
-        this.isHoveringAValue = true;
-        this.hoverStartText = this.$element.$display.val();
-        this.$element.$name.stop().animate( { opacity:0.30 }, 700 );
-        this.$element.$display.addClass( 'ge-e-display-hovered' );
+    case 'mouseenter':
+      this.isHoveringAValue = true;
+      this.hoverStartText = this.$element.$display.val();
+      this.$element.$name.stop().animate( { opacity:0.30 }, 700 );
+      this.$element.$display.addClass( 'ge-e-display-hovered' );
+      this.showText( $( hoverEvent.target ).text() );
+      GE.EvalItemStep.calculatePointedValue( hoverEvent );
+      break;
+    case 'mousemove':
+      if( this.isHoveringAValue ){
         this.showText( $( hoverEvent.target ).text() );
-        GE.EvalItemStep.calculatePointedValue( this.$element.$item, hoverEvent );
-        break;
-      case 'mousemove':
-        if( this.isHoveringAValue ){
-          this.showText( $( hoverEvent.target ).text() );
-        }
-        break;
-      case 'mouseleave':
-        if( this.isHoveringAValue ){ // if user didn't click then restore initial value
-          this.$element.$display.val( this.hoverStartText );
-        };
+      }
+      break;
+    case 'mouseleave':
+      if( this.isHoveringAValue ){ // if user didn't click then restore initial value
+        this.$element.$display.val( this.hoverStartText );
         this.isHoveringAValue = false;
-        this.hoverStartText = '';
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
         this.$element.$name.stop().animate( { opacity:1.00 }, 300 );
-        break;
+      };
+      this.hoverStartText = '';
+      break;
     }
   };
+
+  // click on the value bar to set a new value
+  GE.EvalItemStep.prototype.handleClick = function( clickEvent ){
+    this.eval.value = $( clickEvent.target ).closest( 'td' ).index() + 1; // 1-based
+    this.eval.text = clickEvent.target.textContent;
+    this.$element.$item.find( '.ge-e-one-step' ).removeClass( 'ge-e-one-step-off' ).addClass( 'ge-e-one-step-on' );
+    $( clickEvent.target ).nextAll().removeClass( 'ge-e-one-step-on' ).addClass( 'ge-e-one-step-off' );
+    this.showText( this.eval.text );
+    clickEvent.stopPropagation();
+  };
+
   GE.EvalItemStep.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
@@ -405,11 +438,12 @@
     this.$element = {}; // this item's internal elements
     this.$element.$item = $theItem;
   };
+
   // click on the value bar to set a new value
-  GE.EvalItemSpacer.prototype.handleClick = function( hoverEvent ){
-    beep();
-    return false;
+  GE.EvalItemSpacer.prototype.handleClick = function( clickEvent ){
+    clickEvent.stopPropagation();
   };
+
   GE.EvalItemSpacer.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
@@ -605,7 +639,6 @@
       $theItem.data( 'evalItemData', evalItemObject );
       evalItemObject.setDOMElementReferences( $theItem );
     };
-    GE.currentUserEvals = GE.getCurrentUserEvals( GE.currentUser.id, GE.currentUser.evaluationCriteria );
     var $UIElements = $( '<div/>' ); // the eval items UI elements
     _.each(
       GE.evalItems[ evaluationCriteria ],
@@ -655,17 +688,6 @@
     GE.setEvalItemHoverHandlers();
   };
 
-  GE.setEvalItemHoverHandlers = function(){
-    // when hovering an eval item, show the value associated with the pointer's position
-    $( '.ge-e-value' ).on(
-      'mouseenter.eihh mousemove.eihh mouseleave.eihh',
-      function( event ){
-        var $theItem = $( event.target ).closest( '.ge-e-item' );
-        $theItem.data( 'evalItemData' ).handleHover( event );
-      }
-    );
-  };
-
   GE.selectUsers = function( groupId, usersAlreadyListed ){
     var thisGroup = [];
     _.each(
@@ -691,6 +713,11 @@
     var theId = $evalItem.closest( '.ge-e-item' )[0].id.replace( 'ge-e-item-', '' ); // 123 of ge-e-item-123
     $evalItem.data( 'eval', { id:theId, value:value, text:text } );
     console.log( 'stored for id:' + theId + ' value:' + value + ' text:' + text );
+  };
+
+  GE.getEvalItemData = function( $evalItem ){
+  // given an element of an evaluation item, return a reference to its data object
+    return $evalItem.closest( '.ge-e-item' ).data( 'evalItemData' );
   };
 
   GE.getDisplayElement = function( $evalItem ){
@@ -720,115 +747,30 @@
     return theEvalItem;
   };
 
-  GE.calculatePointedValue = function( $this, hoverEvent ){
-  // TODO: not used any ore, SPS?
-  // returns value and text correponding to the current pointer position 
-  // on a hovered item thus  { value:foo, text:'bar' }
-    var itemDefs = GE.getItemDefs( $this );
-    var value, text;
-    switch( itemDefs.type ){
-      case 'number':
-      case 'p100':
-        var $A = $this.find( '.ge-e-value-A' );
-        var leftEdgePosition = $A.offset().left;
-        var valPx = hoverEvent.pageX - leftEdgePosition;
-        value = Math.round( valPx * ( itemDefs.type === 'p100' ? 100 : itemDefs.topValue ) / $A.parent().width());
-        text = '' + value + ( itemDefs.type === 'p100' ? '%' : '' );
-        break;
-      case 'binary':
-        value = ( $this.find( '.ge-e-binary-yes' ).length > 0 );
-        if( value ){ text = '\u274C' } else { text = '\u2713'; };
-        break;
-      case 'step':
-        value = $( hoverEvent.target ).closest( 'td' ).index(); // zero based
-        text = hoverEvent.target.textContent;
-        break;
-      default:
-        break;
-    }
-    GE.setDisplayText( $this, text );                       // TODO: this does not belong here, or does it?
-    return { id:itemDefs.id, value:value, text:text };
-  };
+  //================================================================================
+  // Evals UI event handlers
 
-  GE.handleNumEvalClick = function( $this, $e, event ){
-    // handle click on number and percent type items
-    var itemDefs = GE.getItemDefs( $this );
-    var topValue = itemDefs.topValue;
-    var $evalItem = $e.closest( '.ge-e-item' );
-    var $A = $this.find( '.ge-e-value-A' );
-    var leftEdgePosition = $A.offset().left;
-    if( $e.hasClass( 'ge-e-display' )){ // click on display area:
-      // make display editable for a number value
-      if( ! $e.attr( 'contenteditable' )){ return; }
-      $e.attr( 'contenteditable' , true );
-      // wait for input
-      $e.one(
-        'blur',
-        function( $this ){ GE.processKBInput( $this ); }
-        // TODO: check input validity, display new value, compute valPx, display graphinc value
-      );
-    } else { // click on graphic display bar:
-      // compute valPx proportional to value and resize bar
-      var valPx = event.pageX - leftEdgePosition;
-      $A.animate( { width: ( valPx / $A.parent().width() * 100 ) + '%' } );
-      // compute value proportional to pointer position
-      var value = Math.round( valPx * ( itemDefs.type === 'p100' ? 100 : itemDefs.topValue ) / $A.parent().width());
-    }
-    var text = '' + value + ( itemDefs.type === 'p100' ? '%' : '' );
-    GE.setEvalValue( $this, value, text );
-    GE.setDisplayText( $this, text );
+  GE.setEvalItemHoverHandlers = function(){
+    // when hovering an eval item, show the value associated with the pointer's position
+    $( '.ge-e-value' ).on(
+      'mouseenter.eihh mousemove.eihh mouseleave.eihh',
+      function( event ){
+        var $theItem = $( event.target ).closest( '.ge-e-item' );
+        $theItem.data( 'evalItemData' ).handleHover( event );
+      }
+    );
   };
 
   GE.handleEvalClick = function( $e, event ){
-    GE.getDisplayElement( $e ).removeClass( 'ge-e-display-hovered' );
-    var $this = $e.closest( '.ge-e-item' );
-    console.log( 'handling evaluation item input for ' + $this.attr( 'class' ) );
-    var evalItemTypeClass = $this.attr('class').split(' ')[1]; // the 2nd class name
-    var isKBInput = $e.hasClass( 'ge-e-display' ); // click was on display area
-    var value, text;
-    switch( evalItemTypeClass ){
-      case 'ge-e-header':
-        return;
-      case 'ge-e-number':
-        var itemDefs = GE.getItemDefs( $this );
-        GE.handleNumEvalClick( $this, $e, event, 'number', itemDefs.topValue );
-        return;
-      case 'ge-e-p100':
-        GE.handleNumEvalClick( $this, $e, event, 'p100' );
-        return;
-      case 'ge-e-binary':
-        var $z = $this.find( '.ge-e-binary-yes' );                          // !!!!!!!!!!!!!!!!!!!!!!! HARDCODED
-        if( $z.length ){
-          $z.removeClass( 'ge-e-binary-yes' ).addClass( 'ge-e-binary-no' );
-          text = '\u274C'; // ❌
-        } else {
-          var $z = $this.find( '.ge-e-binary-no' );
-          $z.removeClass( 'ge-e-binary-no' ).addClass( 'ge-e-binary-yes' );
-          text = '\u2713'; // ✓
-        }
-        GE.setEvalValue( $this, value, text );
-        GE.setDisplayText( $this, text ); // ❌
-        return;
-      case 'ge-e-step':
-      // handle click on enumerated type items
-        var $display = GE.getDisplayElement( $this );
-        if( $e.hasClass( 'ge-e-display' )){ // click on display area:
-          // build and open a drop-down for the user to choose
-        } else { // click on a value cell
-          value = $( event.target ).closest( 'td' ).index() + 1; // 1-based
-          text = event.target.textContent;
-          $this.find( '.ge-e-one-step' ).removeClass( 'ge-e-one-step-on  ge-e-one-step-off' ).addClass( 'ge-e-one-step-on' );
-          $( event.target ).nextAll().removeClass( 'ge-e-one-step-on' ).addClass( 'ge-e-one-step-off' );
-        }
-        GE.setEvalValue( $this, value, text );
-        GE.setDisplayText( $this, text );
-        $display.text( text );
-        return;
-      case 'ge-e-spacer':
-        return;
-      default:
-        return;
-    }
+    // handle click on a value to change it
+    var eio = GE.getEvalItemData( $e );
+    if( eio.$element.$display ){
+      eio.isHoveringAValue = false;
+      eio.$element.$display.removeClass( 'ge-e-display-hovered' )
+      eio.handleClick( event );
+      event.stopPropagation();
+      // TODO: store evaluation values in the model here
+    };
   };
 
   GE.buildStepItemUI = function( $eventTarget, evalItemDef ){
@@ -929,10 +871,6 @@ $(this).trigger({
     // the display of an eval item has focus and gets KB input
     $eventTarget.off( 'keypress' );
 
-    // if( ! GE.mouseIsDown){ // if focus given by keyboard action
-    //   GE.selectElementText( $eventTarget[0] ); // select current text
-    // };
-
     // build input UI for enumerated eval items
     if( evalItemDef.type === 'step' ){
       GE.buildStepItemUI( $eventTarget, evalItemDef );
@@ -988,6 +926,7 @@ $(this).trigger({
     // turn off this element's KB events handler
   };
 
+  //================================================================================
 
   $(document).ready( function (){
     // _.each(list, iteratee, [context]) Alias: forEach 
@@ -1023,6 +962,7 @@ $(this).trigger({
         var $userEvals = $LIContainer.find('.ge-evaluations');
         if( ! $userEvals.hasClass( 'ge-loaded' ) ){
           $( '.ge-e-value' ).off( ".eihh" ); // remove prior event handlers
+          GE.currentUserEvals = GE.getCurrentUserEvals( GE.currentUser.id, GE.currentUser.evaluationCriteria );
           GE.evalItemsBuild( $clickTarget, GE.currentUser.evaluationCriteria );
           $userEvals.addClass( 'ge-loaded' );
         };
@@ -1113,23 +1053,6 @@ $(this).trigger({
             }
           );
         };
-      }
-    );
-
-
-    // activate click to edit an evaluation item value
-    $( '#ge-evaluations-5 .ge-e-item' ).one(
-      'click',
-      function( event ){
-        $clickTarget = $( event.delegateTarget );
-        console.log( 'clicked: ' + $clickTarget.attr( 'class' ) + ' ' + $( event.target ).text().trim() );
-      }
-    );
-
-    $( '.ge-e-one-step' ).on(
-      'mouseenter mousemove mouseleave',
-      function( event ){
-        $( event.target ).closest( '.ge-e-value' ).trigger( event.type );
       }
     );
 

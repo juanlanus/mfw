@@ -417,9 +417,22 @@ of client. </p>
       <li class="doneItem">Move focus with ↑ and ↓ </li>
       <li class="doneItem">Set input text with spacebar</li>
       <li class="doneItem">Set input text and leave with enter</li>
-      <li>Reflect the selected value in the graphic bar</li>
-      <li>Remove event handlers on focus out</li>
+      <li class="doneItem">Reflect the selected value in the graphic bar</li>
+      <li class="doneItem">Remove event handlers on focus out</li>
     </ul>
+  </li>
+  <li>Add a refrence to the current evaluation into the eval item objects</li>
+  <li>In the eval item objects, add a method to synchronize the value in the
+    UI with the value in the evaluation object</li>
+  <li class="doneItem">Define eval data structure inside the eval item objects:
+    <p>In the objects where it's relevant, a member is an object that can hold
+    a number of properties, the most relevant are value and text:
+      <ul>
+        <li>value: the actual evaluation value, a number</li>
+        <li>text: the value formatted to be displayed</li>
+        <li>hasValue: a boolean stating that this eval item has been assigned</li>
+      </ul>
+    </p>
   </li>
   <li>Store kb-changed values into the eval object</li>
   <li>Reflect kb-entered values in the approrpriate gaphics bar</li>
