@@ -401,6 +401,7 @@
     evalData.v = GE.getEvalItemValue( this.evalItemId ); // { value:..., text:..., hasValue:... }
     return this.template( evalData );
   };
+
   GE.EvalItemStep.prototype.templateSource = 
     '<div id="ge-e-item-<%= u.def.id %>" class="ge-e-item ge-e-step">' +
     '  <div class="ge-e-value">' +
@@ -471,6 +472,7 @@
     }
   };
 
+  // user groups defs, in this case the team and the others
   GE.userGroups = [ {
     groupName: "team",
     groupDescription: "G2G / StarMeUp",
@@ -528,9 +530,6 @@
     } // , ... more users
   };
 
-  // current evaluee last two evaluations (1st is new or incomplete)
-  GE.currentUserEvals = [];
-
   GE.emptyEvaluation = { // created dynamically with GE.evalItems
     // indexed by evaluation criteria
     42: {
@@ -546,9 +545,26 @@
     }
   };
 
+  // current evaluee last two evaluations (1st is new or incomplete)
+  GE.currentUserEvals = [];
+
   GE.currentUser = null; // selected user's file entry
 
   //================================================================================
+
+  // build users list
+  GE.builsUsersList = function(){
+    // console.log( 'GE.users: ' + GE.users.length );  // JSON.stringify( GE.users, null, 2 ) );
+    GE.usersAlreadyListed = []; // no users listed
+    var templateSource = _.template( $( 'script#ge-template-users' ).html() ).source; // precompilation?
+    var templateForUsers = _.template( $( 'script#ge-template-users' ).html() );
+    var HTMLForUsers = templateForUsers( GE.userGroups );
+    $( '#ge-evalueeGroups' ).html( HTMLForUsers );
+    // add empty padding at the bottom of the users list to ensure scroll to top
+    $( '#ge-padding' ).height( window.height);
+  };
+
+  // Access users file with an id as the key
   GE.getUserData = function( currentUserId ){
     return _.find( GE.users, function( user ){ return user.id == currentUserId; } );
   };
@@ -607,6 +623,27 @@
     return e;
   };
 
+  // Return the users belonging to a user group (a query)
+  GE.selectUsers = function( groupId, usersAlreadyListed ){
+    var thisGroup = [];
+    _.each(
+      GE.users,
+      function( thisUser, i, allUsers ){
+        if( groupId === '*' ){
+          if( ! usersAlreadyListed[ i ] ){
+            thisGroup.push( thisUser);
+          }
+        } else {
+          if( thisUser.project === groupId ){
+            thisGroup.push( thisUser);
+            usersAlreadyListed[ i ] = true;
+          }
+        }
+      }
+    );
+    return thisGroup;
+  };
+
   GE.putCurrentUserEvals = function( ){
     // TODO: write th current user's evaluations to localStorage
   };
@@ -627,6 +664,9 @@
     } else { /* nothing */ };
     return v;
   };
+
+  //================================================================================
+  // Build eval items UI and activate event handlers
 
   GE.evalItemsBuild = function( $clickTarget, evaluationCriteria ){
     // TODO: remove the previous eval items set
@@ -688,63 +728,9 @@
     GE.setEvalItemHoverHandlers();
   };
 
-  GE.selectUsers = function( groupId, usersAlreadyListed ){
-    var thisGroup = [];
-    _.each(
-      GE.users,
-      function( thisUser, i, allUsers ){
-        if( groupId === '*' ){
-          if( ! usersAlreadyListed[ i ] ){
-            thisGroup.push( thisUser);
-          }
-        } else {
-          if( thisUser.project === groupId ){
-            thisGroup.push( thisUser);
-            usersAlreadyListed[ i ] = true;
-          }
-        }
-      }
-    );
-    return thisGroup;
-  };
-
-  GE.setEvalValue = function( $evalItem, value, text ){
-    // TODO: stored data never used, must store in the eval item's object
-    var theId = $evalItem.closest( '.ge-e-item' )[0].id.replace( 'ge-e-item-', '' ); // 123 of ge-e-item-123
-    $evalItem.data( 'eval', { id:theId, value:value, text:text } );
-    console.log( 'stored for id:' + theId + ' value:' + value + ' text:' + text );
-  };
-
-  GE.getEvalItemData = function( $evalItem ){
   // given an element of an evaluation item, return a reference to its data object
+  GE.getEvalItemData = function( $evalItem ){
     return $evalItem.closest( '.ge-e-item' ).data( 'evalItemData' );
-  };
-
-  GE.getDisplayElement = function( $evalItem ){
-  // given an element of an evaluation item, return a reference to its display
-    return $evalItem.closest( '.ge-e-item' ).find( '.ge-e-display' );
-  };
-
-  GE.setDisplayText = function( $evalItem, displayText ){
-  // given an element of an evaluation item, set its display text
-    var $display = GE.getDisplayElement( $evalItem );
-    $display.val( displayText );
-  };
-
-  GE.processKBInput = function( $e ){
-    console.log( 'handling KB input:' + $e.target.textContent.trim() );
-  };
-
-  GE.getItemDefs = function( $this ){
-  // return the eval item type, or null if not an evaluatable item
-    // TODO: the def is references in the item's object, this function not needed
-    var $item = $this.closest( '.ge-e-item' );
-    if( ! $item.length ){ return null; } // arg was not an eval item
-    if( $item.hasClass( 'ge-e-spacer ge-e-header' ) ){ return null; }
-    var theId = $item[0].id.replace( 'ge-e-item-', '' ); // 123 of ge-e-item-123
-    // TODO: the evaluationCriteria thing is wrong: it must be the evaluation's, not the evaluee's
-    var theEvalItem = GE.evalItems[ GE.currentUser.evaluationCriteria ][ theId ]; 
-    return theEvalItem;
   };
 
   //================================================================================
@@ -773,8 +759,8 @@
     };
   };
 
+  // set quicksearch in step-type eval itens
   GE.buildStepItemUI = function( $eventTarget, evalItemDef ){
-    // show choices selector and enable step type eval item quicksearch
     $( '#ge-e-stepInputChoices' ).show( 400 );
     var qs = $('#ge-e-stepInput').quicksearch(
       '#ge-e-stepInputChoices li',
@@ -807,38 +793,6 @@
         };
       }
     );
-/* step-type eval item example:
-<div id="ge-e-item-7" class="ge-e-item ge-e-step">                   2: get a ref to this
-  <div class="ge-e-value">                        
-    <table><tbody>
-      <tr>
-        <td class="ge-e-one-step ge-e-one-step-on" style="width:20%">awful</td>
-        <td class="ge-e-one-step ge-e-one-step-on" style="width:20%">low</td>
-        <td class="ge-e-one-step ge-e-one-step-on" style="width:20%">regular</td>
-        <td class="ge-e-one-step ge-e-one-step-off" style="width:20%">high</td>
-        <td class="ge-e-one-step ge-e-one-step-off" style="width:20%">impressing</td>
-      </tr>
-    </tbody></table>
-  </div>
-  <div class="ge-e-name">Advise acceptance</div>
-  <input type="text" class="ge-e-display" tabindex="0" value="">     3: get a ref to this and set its text
-  <ul id="ge-e-stepInputChoices" class="ge-e-stepChoices">           
-    <li tabindex="0">0 awful</li>                                    1: kb action here
-    <li tabindex="0">1 low</li>
-    <li tabindex="0">2 regular</li>
-    <li tabindex="0">3 high</li>
-    <li tabindex="0">4 impressing</li>
-  </ul>
-</div>
-$(this).trigger({
-    type: 'keypress',
-    which: 9
-});
-    up = 38
-    down = 40
-    left = 37
-    right = 39
-*/
     // move up and down within the steps list with the arrows
     $( '#ge-e-stepInputChoices li' ).on(
       'keydown.kbStep',
@@ -934,19 +888,7 @@ $(this).trigger({
     // If list is a JavaScript object, iteratee's arguments will be (value, key, list).
 
     // build users list
-    // console.log( 'GE.users: ' + GE.users.length );  // JSON.stringify( GE.users, null, 2 ) );
-    GE.usersAlreadyListed = []; // no users listed
-    var templateSource = _.template( $( 'script#ge-template-users' ).html() ).source; // precompilation?
-    var templateForUsers = _.template( $( 'script#ge-template-users' ).html() );
-    var HTMLForUsers = templateForUsers( GE.userGroups );
-    $( '#ge-evalueeGroups' ).html( HTMLForUsers );
-    // add empty padding at the bottom of the users list to ensure scroll to top
-    $( '#ge-padding' ).height( window.height);
-
-    // attach hardcoded evaluations context #hardCodedEvaluationsInputContext to a single user
-    var $attachTarget = $( "#ge-evaluations-5" );
-    var $attachSource = $( "#ge-evaluations-5-hardCoded" );
-    $attachTarget.html( $attachSource.html() );
+    GE.builsUsersList();
 
     // handle click event on a user data or on evaluations
     $( '#ge-evalueeGroups .ge-users-group' ).on(
@@ -1017,10 +959,8 @@ $(this).trigger({
           console.log( '\nfocus on an evaluee ' + $( event.target ).find( '.ge-user-name' ).text().trim() );
           event.stopPropagation();
         } else { // eval item display: allow edition
-          var $evalItem = $eventTarget.closest( '.ge-e-item' );
-          console.log( 'focus on eval item ' + $evalItem.find( '.ge-e-name' ).text() );
           event.stopPropagation();
-          var evalItemDef = GE.getItemDefs( $evalItem );
+          var evalItemDef = GE.getEvalItemData( $eventTarget ).evalItem;
           GE.setEvalItemKBHandler( $eventTarget, evalItemDef );
           $eventTarget.one(
             'blur',
