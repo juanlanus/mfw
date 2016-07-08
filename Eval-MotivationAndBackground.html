@@ -354,6 +354,14 @@ of client. </p>
 <h5>bugs</h5>
 <ol>
   <li>Focus on a user data element not loadinf its eval items UI any more</li>
+  <li>Each time a user is clicked it add a new version of the eval items UI</li>
+  <li>Clicking the display area of a numeric eval item computes a value that exceeds its top value
+    <pre>  GE.handleEvalClick = function( $e, event ){
+    // handle click on a value to change it
+    if( ! $e.closest( '.ge-e-value' ).length ){ return; }    &lt;== this!
+    var eio = GE.getEvalItemData( $e );</pre>
+  </li>
+  <li>After having selected a step item, the name colos does not return to black</li>
 </ol>
 
 <h5>features</h5>

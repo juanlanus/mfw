@@ -749,6 +749,7 @@
 
   GE.handleEvalClick = function( $e, event ){
     // handle click on a value to change it
+    if( ! $e.closest( '.ge-e-value' ).length ){ return; }
     var eio = GE.getEvalItemData( $e );
     if( eio.$element.$display ){
       eio.isHoveringAValue = false;
