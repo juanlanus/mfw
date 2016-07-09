@@ -98,6 +98,7 @@
         break;
     }
   };
+
   // click on the value bar to set a new value
   GE.EvalItemNumber.prototype.handleClick = function( clickEvent ){
     var $A = this.$element.$item.find( '.ge-e-value-A' );
@@ -108,6 +109,11 @@
     this.eval.value = Math.round( valPx * this.evalItem.topValue / $A.parent().width() );
     this.eval.text = '' + this.eval.value;
     this.showText( this.eval.text );
+  };
+
+  // manage keyboard input
+  GE.EvalItemNumber.prototype.handleKeydown = function( keyEvent ){
+    if( ! GE.isDigit( String.fromCharCode( keyEvent.which ) ) ){ keyEvent.preventDefault(); }
   };
 
   GE.EvalItemNumber.prototype.buildHTML = function( evalData ){
@@ -199,6 +205,11 @@
     this.eval.value = Math.round( valPx * 100 / $A.parent().width() );
     this.eval.text = '' + this.eval.value + '%';
     this.showText( this.eval.text );
+  };
+
+  // manage keyboard input
+  GE.EvalItemP100.prototype.handleKeydown = function( keyEvent ){
+    if( ! GE.isDigit( String.fromCharCode( keyEvent.which ) ) ){ keyEvent.preventDefault(); }
   };
 
   GE.EvalItemP100.prototype.buildHTML = function( evalData ){
@@ -296,6 +307,34 @@
     this.showText( this.eval.text );
   };
 
+  // manage keyboard input
+  GE.EvalItemBinary.prototype.handleKeydown = function( keyEvent ){
+    var $eventTarget = $( keyEvent.target );
+    switch( keyEvent.which ){
+    case 32: // spacebar: if checked then uncheck else check
+      // console.log( 'spacebar in binary eval item containing "' + $eventTarget.text().trim() + '"' );
+      $eventTarget.val( ( $eventTarget.val().trim() === '\u2713' ) ? '\u274c' : '\u2713' ); // ✓ &#x2713; ❌ &#x274c; 
+      break;
+    case 49:  // 1: set on
+    case 38:  // up arrow: set on
+    case 43:  // +: set on
+    case 121: // y: set on
+    case 89:  // Y: set on
+    case 115: // s: set on
+    case 83:  // S: set on
+      $eventTarget.val( '\u2713' );
+      break;
+    case 48:  // 0: set off
+    case 40:  // down arrow: set off
+    case 45:  // -: set off
+    case 110: // n: set off
+    case 78:  // N: set off
+      $eventTarget.val( '\u274c' );
+      break;
+    }
+    keyEvent.preventDefault();
+  };
+
   GE.EvalItemBinary.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
@@ -377,6 +416,7 @@
         this.$element.$display.removeClass( 'ge-e-display-hovered' );
         this.$element.$name.stop().animate( { opacity:1.00 }, 300 );
       };
+      this.$element.$name.stop().animate( { opacity:1.00 }, 300 );
       this.hoverStartText = '';
       break;
     }
@@ -834,45 +874,10 @@
     $eventTarget.on(
       'keypress',
       evalItemDef,
-      function( event ){
-        var char = String.fromCharCode( event.which );
-        var keyCode = event.which;
-        switch ( evalItemDef.type ){
-        case 'number':
-          if( ! GE.isDigit( char ) ){ event.preventDefault(); }
-          break;
-        case 'p100':
-          if( ! GE.isDigit( char ) ){ event.preventDefault(); }
-          break;
-        case 'binary': // '\u2713' : '\u274C'; // ❌ &#x274c; ✓ &#x2713; 
-          switch( event.which ){
-          case 32: // spacebar: if checked then uncheck else check
-            // console.log( 'spacebar in binary eval item containing "' + $eventTarget.text().trim() + '"' );
-            $eventTarget.val( ( $eventTarget.val().trim() === '\u2713' ) ? '\u274c' : '\u2713' ); // ✓ &#x2713; ❌ &#x274c; 
-            break;
-          case 49:  // 1: set on
-          case 38:  // up arrow: set on
-          case 43: // +: set on
-          case 121: // y: set on
-          case 89: // Y: set on
-          case 115: // s: set on
-          case 83: // S: set on
-            $eventTarget.val( '\u2713' );
-            break;
-          case 48:  // 0: set off
-          case 40:  // down arrow: set off
-          case 45: // -: set off
-          case 110: // n: set off
-          case 78: // N: set off
-            $eventTarget.val( '\u274c' );
-            break;
-          }
-          event.preventDefault();
-          break;
-        default: // eval item type
-          break;
-        };
-        event.stopPropagation();
+      function( keyEvent ){
+        var eio = GE.getEvalItemData( $( keyEvent.target ) );
+        eio.handleKeydown( keyEvent );
+        keyEvent.stopPropagation();
       }
     )
   };
@@ -956,7 +961,7 @@
         var $eventTarget = $( event.target );
         // focus on evaluee header
         if( $eventTarget.hasClass( 'ge-oneUser' ) ){
-          $eventTarget.click(); // user: display eval items UI
+          $eventTarget.mouseup(); // user: display eval items UI
           console.log( '\nfocus on an evaluee ' + $( event.target ).find( '.ge-user-name' ).text().trim() );
           event.stopPropagation();
         } else { // eval item display: allow edition
