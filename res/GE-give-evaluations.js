@@ -432,6 +432,11 @@
     clickEvent.stopPropagation();
   };
 
+  // manage keyboard input
+  GE.EvalItemStep.prototype.handleKeydown = function( keyEvent ){
+    // do nothing: QuickSearch does it
+  };
+
   GE.EvalItemStep.prototype.buildHTML = function( evalData ){
     if( ! this.template ){
       this.template = _.template( this.templateSource );
@@ -457,6 +462,68 @@
     '    <% _.each( u.def.steps, function( stepName, i, steps ){ %><li tabindex="0"><%= ( i + 1 ) + " " + stepName %></li><% }); %>' +
     '  </ul>' +
     '</div>';
+
+  // set quicksearch in step-type eval itens
+  GE.EvalItemStep.buildStepQS = function( $eventTarget ){
+    $( '#ge-e-stepInputChoices' ).show( 400 );
+    var qs = $('#ge-e-stepInput').quicksearch(
+      '#ge-e-stepInputChoices li',
+      {
+        removeDiacritics: true,
+        show: function () { $(this).removeClass('hiddenByQS'); },
+        hide: function () { $(this).addClass('hiddenByQS'); },
+      }
+    );
+    // capture kb input on step input choices
+    $( '#ge-e-stepInputChoices li' ).on(
+      'keypress.kbStep',
+      function( event ){
+        var $this = $( this );
+        var $theDisplayElement = $this.closest( '.ge-e-item' ).find( '.ge-e-display' );
+        var stepName = $this.text();
+        stepName = stepName.substring( stepName.indexOf( ' ' ) + 1 ); // trim number
+        switch( event.which ){
+          case 32: // space: select current value
+            console.log( 'spacebar in ' + $this.text() );
+            event.preventDefault();
+            $theDisplayElement.val( stepName );
+            break;
+          case 13: // enter: select current value and go forward
+            console.log( 'enter in ' + $this.text() );
+            event.preventDefault();
+            $theDisplayElement.val( stepName );
+            $this.parent().hide( 100 );
+            break;
+        };
+      }
+    );
+    // move up and down within the steps list with the arrows
+    $( '#ge-e-stepInputChoices li' ).on(
+      'keydown.kbStep',
+      function( event ){
+        var $this = $( this );
+        switch( event.which ){
+          case 38: // keyup: move to previous
+            console.log( 'keyup in ' + $this.text() );
+            event.preventDefault();
+            event.stopPropagation();
+            event.which = 0;
+            var $prev = $this.prev();
+            if( $prev.length ){ $prev.focus() };
+          break;
+          case 40: // keydown: move to next
+            console.log( 'keydown in ' + $this.text() );
+            event.preventDefault();
+            event.stopPropagation();
+            event.which = 0;
+            var $next = $this.next();
+            if( $next.length ){ $next.focus() };
+          break;
+        };
+      }
+    );
+
+  };
 
   //================================================================================
   // Class for spacer-type eval items
@@ -800,75 +867,13 @@
     };
   };
 
-  // set quicksearch in step-type eval itens
-  GE.buildStepItemUI = function( $eventTarget, evalItemDef ){
-    $( '#ge-e-stepInputChoices' ).show( 400 );
-    var qs = $('#ge-e-stepInput').quicksearch(
-      '#ge-e-stepInputChoices li',
-      {
-        removeDiacritics: true,
-        show: function () { $(this).removeClass('hiddenByQS'); },
-        hide: function () { $(this).addClass('hiddenByQS'); },
-      }
-    );
-    // capture kb input on step input choices
-    $( '#ge-e-stepInputChoices li' ).on(
-      'keypress.kbStep',
-      function( event ){
-        var $this = $( this );
-        var $theDisplayElement = $this.closest( '.ge-e-item' ).find( '.ge-e-display' );
-        var stepName = $this.text();
-        stepName = stepName.substring( stepName.indexOf( ' ' ) + 1 ); // trim number
-        switch( event.which ){
-          case 32: // space: select current value
-            console.log( 'spacebar in ' + $this.text() );
-            event.preventDefault();
-            $theDisplayElement.val( stepName );
-            break;
-          case 13: // enter: select current value and go forward
-            console.log( 'enter in ' + $this.text() );
-            event.preventDefault();
-            $theDisplayElement.val( stepName );
-            $this.parent().hide( 100 );
-            break;
-        };
-      }
-    );
-    // move up and down within the steps list with the arrows
-    $( '#ge-e-stepInputChoices li' ).on(
-      'keydown.kbStep',
-      function( event ){
-        var $this = $( this );
-        switch( event.which ){
-          case 38: // keyup: move to previous
-            console.log( 'keyup in ' + $this.text() );
-            event.preventDefault();
-            event.stopPropagation();
-            event.which = 0;
-            var $prev = $this.prev();
-            if( $prev.length ){ $prev.focus() };
-          break;
-          case 40: // keydown: move to next
-            console.log( 'keydown in ' + $this.text() );
-            event.preventDefault();
-            event.stopPropagation();
-            event.which = 0;
-            var $next = $this.next();
-            if( $next.length ){ $next.focus() };
-          break;
-        };
-      }
-    );
-
-  };
-
   GE.setEvalItemKBHandler = function( $eventTarget, evalItemDef ){
     // the display of an eval item has focus and gets KB input
     $eventTarget.off( 'keypress' );
 
     // build input UI for enumerated eval items
     if( evalItemDef.type === 'step' ){
-      GE.buildStepItemUI( $eventTarget, evalItemDef );
+      GE.EvalItemStep.buildStepQS( $eventTarget, evalItemDef );
     };
 
     $eventTarget.on(
@@ -900,7 +905,7 @@
     $( '#ge-evalueeGroups .ge-users-group' ).on(
       'mouseup',
       function( event ){
-        if( ! event.which === 1 ) { return; } // not the primary button
+        if( event.which !== 1 ) { return; } // not the primary button
         $clickTarget = $( event.target );
         var $LIContainer = $clickTarget.closest( 'li' );
         // get user's data
@@ -910,15 +915,12 @@
         var $userEvals = $LIContainer.find('.ge-evaluations');
         if( ! $userEvals.hasClass( 'ge-loaded' ) ){
           $( '.ge-e-value' ).off( ".eihh" ); // remove prior event handlers
+          $( '.ge-evalueeGroups' ).find( '.ge-evaluations.ge-loaded' ).removeClass( 'ge-loaded' ).empty();
+
           GE.currentUserEvals = GE.getCurrentUserEvals( GE.currentUser.id, GE.currentUser.evaluationCriteria );
           GE.evalItemsBuild( $clickTarget, GE.currentUser.evaluationCriteria );
           $userEvals.addClass( 'ge-loaded' );
-        };
-        // ensure that eval items UI is the only visible one
-        if( ! $userEvals.is(':visible') ){
-          $( '.ge-loaded' ).not( $userEvals ).removeClass( 'ge-loaded' ).hide();
           $userEvals.slideDown( 400 );
-          // TODO: NOT NEEDED ANY MORE: GE.evalItemsResize( $clickTarget, event );
         };
         // ensure the user data is at the top of the screen
         var itemOffset =  $LIContainer.offset();
@@ -961,7 +963,7 @@
         var $eventTarget = $( event.target );
         // focus on evaluee header
         if( $eventTarget.hasClass( 'ge-oneUser' ) ){
-          $eventTarget.mouseup(); // user: display eval items UI
+          $eventTarget.trigger( { type: 'mouseup', which: 1 } ); // user: display eval items UI
           console.log( '\nfocus on an evaluee ' + $( event.target ).find( '.ge-user-name' ).text().trim() );
           event.stopPropagation();
         } else { // eval item display: allow edition

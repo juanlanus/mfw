@@ -355,11 +355,15 @@ of client. </p>
 <ol>
   <li class="doneItem">Focus on a user data element not loading its eval items UI
     any more</li>
-  <li>Each time a user is clicked a new version of the eval items UI is added</li>
+  <li class="doneItem">Each time a user is clicked a new version of the eval items
+    UI is added</li>
   <li class="doneItem">Clicking the display area of a numeric eval item computes a
     value that exceeds its top value</li>
   <li class="doneItem">After having selected a step item, the name color does not
     return to black</li>
+  <li>When a value is selected in a step-type eval item with the keyboard, the 
+    value bar does not reflect the new value but stays as it was</li>
+  <li>Hovering a binary eval item does not display the would-be value</li>
 </ol>
 
 <h5>features</h5>
@@ -402,7 +406,7 @@ of client. </p>
       UI</li>
       <li>Upon alt-↓ in the header reveal the eval items UI</li>
       <li class="doneItem">Have an editable element in each eval item</li>
-      <li><img src="res/caramba_yellow.gif"> Process keyboard events for each
+      <li class="doneItem"> Process keyboard events for each
         eval item type</li>
       <li class="doneItem">Filter input, depending on eval item type, allowing
         only numbers or whatever appropriate for each</li>
@@ -416,8 +420,8 @@ of client. </p>
       <li class="doneItem">Whenever an input is focused by tabbing into it,
         select its content</li>
       <li>Add code to store the newly entered values</li>
-      <li>Prevent pasting into contenteditable elements </li>
-      <li>Remove error marker class from valus display when the value is
+      <li class="doneItem">Prevent pasting into contenteditable elements </li>
+      <li>Remove error marker class from value display when the value is
         changed using the mouse (will always be right) </li>
     </ul>
   </li>
@@ -425,7 +429,7 @@ of client. </p>
     controlled fashion</li>
   <li class="doneItem">Upon hover on a step-type eval item, make the name
     almost transparent, to ease the reading of the step labels</li>
-  <li>Step-type items: handle kb input inside options list 
+  <li class="doneItem">Step-type items: handle kb input inside options list 
     <ul>
       <li class="doneItem">Move focus with ↑ and ↓ </li>
       <li class="doneItem">Set input text with spacebar</li>
@@ -434,7 +438,8 @@ of client. </p>
       <li class="doneItem">Remove event handlers on focus out</li>
     </ul>
   </li>
-  <li>Add a refrence to the current evaluation into the eval item objects</li>
+  <li class="doneItem">Add a refrence to the current evaluation into the eval
+    item objects</li>
   <li>In the eval item objects, add a method to synchronize the value in the
     UI with the value in the evaluation object</li>
   <li class="doneItem">Define eval data structure inside the eval item objects:
@@ -448,28 +453,27 @@ of client. </p>
     </p>
   </li>
   <li>Store kb-changed values into the eval object</li>
-  <li>Reflect kb-entered values in the approrpriate gaphics bar</li>
+  <li>Reflect kb-entered values in the approrpriate graphic bar</li>
   <li>Not destroying the input UI of an evaluee (allowing more than one at
   a given time) might result in duplicate DOM ids</li>
   <li><img alt="doing now" src="res/caramba_yellow.gif">
     Refactor eval items into classes, one per eval item type:
     <ul>
-      <li><img alt="doing now" src="res/caramba_yellow.gif"> Create an
-        eval item object whenever an eval item is built by GE.evalItemsBuild()
-        <ul>
-          <li>header type items</li>
-          <li>number type items</li>
-          <li>percent type items</li>
-          <li><img alt="doing now" src="res/caramba_yellow.gif"> step type items</li>
-          <li>binary type items</li>
-          <li>spacer type items</li>
+      <li class="doneItem">Create an eval item object whenever an eval item
+        is built by GE.evalItemsBuild() <ul>
+          <li class="doneItem">header type items</li>
+          <li class="doneItem">number type items</li>
+          <li class="doneItem">percent type items</li>
+          <li> class="doneItem"step type items</li>
+          <li class="doneItem">binary type items</li>
+          <li class="doneItem">spacer type items</li>
       </li>
       <li>Instead of building the UI as an HTML text, build it as a set of elements
         initially decoupled from DOM, and attach them at the end, in order to be able to 
         create references to the parts of an item</li>
       <li class="doneItem">Store a ref to the eval item object in the jQuery data attribute
         of the eval item HTML element</li>
-      <li>Properties:
+      <li class="doneItem">Properties:
         <ol>
           <li>type</li>
           <li>hasValue</li>
@@ -478,7 +482,7 @@ of client. </p>
           <li>valuePrevious</li>
       </ol>
       <li>Methods: 
-        <ol>
+        <ol class="doneItem">
           <li>reflect the eval item value in the HTML element's graphic bar</li>
           <li>text (calculate it on the fly vs. storing a property?)</li>
       </ol>
