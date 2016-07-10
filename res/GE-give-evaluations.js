@@ -278,7 +278,7 @@
         break;
       case 'mousemove':
         if( this.isHoveringAValue ){
-          GE.EvalItemBinary.calculatePointedValue( this.$element.$item, hoverEvent );
+          this.showText( GE.EvalItemBinary.calculatePointedValue( this.$element.$item, hoverEvent ) );
         }
         break;
       case 'mouseleave':
@@ -441,9 +441,6 @@
     if( ! this.template ){
       this.template = _.template( this.templateSource );
     };
-    // TODO: SPS? (3)
-    var evalData = { def:this.evalItem, value:0, text:'' };
-    evalData.v = GE.getEvalItemValue( this.evalItemId ); // { value:..., text:..., hasValue:... }
     return this.template( evalData );
   };
 
@@ -456,7 +453,7 @@
     '      <% } ) %></tr>' +
     '    </tbody></table>' +
     '  </div>' +
-    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>">Advise acceptance</div>' +
+    '  <div class="ge-e-name<%= u.def.optional ? " ge-e-name-optional":"" %>"><%= u.def.description %></div>' +
     '  <input type="text" id="ge-e-stepInput" class="ge-e-display" tabindex="0" value="<%= u.v.text %>">' +
     '  <ul id="ge-e-stepInputChoices" class="ge-e-stepChoices" style="display:none;">' +
     '    <% _.each( u.def.steps, function( stepName, i, steps ){ %><li tabindex="0"><%= ( i + 1 ) + " " + stepName %></li><% }); %>' +
@@ -464,7 +461,7 @@
     '</div>';
 
   // set quicksearch in step-type eval itens
-  GE.EvalItemStep.buildStepQS = function( $eventTarget ){
+  GE.EvalItemStep.prototype.buildStepQS = function( $eventTarget ){
     $( '#ge-e-stepInputChoices' ).show( 400 );
     var qs = $('#ge-e-stepInput').quicksearch(
       '#ge-e-stepInputChoices li',
@@ -867,14 +864,13 @@
     };
   };
 
-  GE.setEvalItemKBHandler = function( $eventTarget, evalItemDef ){
-    // the display of an eval item has focus and gets KB input
+  GE.activateEvalItemKBHandler = function( $eventTarget ){
+    // the display of an eval item has got focus and gets KB input
     $eventTarget.off( 'keypress' );
 
-    // build input UI for enumerated eval items
-    if( evalItemDef.type === 'step' ){
-      GE.EvalItemStep.buildStepQS( $eventTarget, evalItemDef );
-    };
+    var eio = GE.getEvalItemData( $eventTarget );
+    var evalItemDef = eio.evalItem;
+    eio.buildStepQS && eio.buildStepQS( $eventTarget, evalItemDef );
 
     $eventTarget.on(
       'keypress',
@@ -888,7 +884,7 @@
   };
 
   GE.resetEvalItemKBHandler = function( $eventTarget ){
-    // turn off this element's KB events handler
+    // unbind quicksearch of this step element
   };
 
   //================================================================================
@@ -955,42 +951,35 @@
 
     $('#userFilter').focus(); // set initial focus to search box
 
-    // main focus handler
+    // handle focus on evaluee data or eval items
     $( '.ge-evalueesGroup' ).on(
       'focus',
       '.ge-oneUser',
       function( event ){
         var $eventTarget = $( event.target );
-        // focus on evaluee header
-        if( $eventTarget.hasClass( 'ge-oneUser' ) ){
+        if( $eventTarget.hasClass( 'ge-oneUser' ) ){      // focus on evaluee header
           $eventTarget.trigger( { type: 'mouseup', which: 1 } ); // user: display eval items UI
           console.log( '\nfocus on an evaluee ' + $( event.target ).find( '.ge-user-name' ).text().trim() );
-          event.stopPropagation();
-        } else { // eval item display: allow edition
-          event.stopPropagation();
-          var evalItemDef = GE.getEvalItemData( $eventTarget ).evalItem;
-          GE.setEvalItemKBHandler( $eventTarget, evalItemDef );
-          $eventTarget.one(
+        } else {                                          // focus on eval item
+          var eio = GE.getEvalItemData( $eventTarget );   // the eval item object
+          GE.activateEvalItemKBHandler( $eventTarget );
+          $eventTarget.one(                               // set blur event
             'blur',
-            evalItemDef,
+            eio,
             function( event ){
-              $theValue = $( event.target );
-              $theItem = $eventTarget.closest( '.ge-e-item' ); // DEBUG?
-              console.log( '  exit from edited field ' + $theItem.find( '.ge-e-name' ).text()
-              + ' ' +  $(this).attr('class') + ' ' + $theValue.val() + ' type:' + evalItemDef.type );
-              GE.resetEvalItemKBHandler( $theValue );
-              $theValue.removeClass( 'ge-e-value-error' );
-              switch ( evalItemDef.type ){
+              GE.resetEvalItemKBHandler( eio.$element.$value );
+              eio.$element.$value.removeClass( 'ge-e-value-error' );
+              switch ( eio.evalItem.type ){
               case 'number':
-                if( parseInt( $theValue.val(), 10 ) > evalItemDef.topValue ){
-                  $theValue.addClass( 'ge-e-value-error' );
+                if( parseInt( eio.$element.$value.val(), 10 ) > eio.evalItem.topValue ){
+                  eio.$element.$value.addClass( 'ge-e-value-error' );
                   GE.beep();
                   event.preventDefault();
                 }
                 break;
               case 'p100':
-                if( parseInt( $theValue.val(), 10 ) > 100 ){
-                  $theValue.addClass( 'ge-e-value-error' );
+                if( parseInt( eio.$element.$value.val(), 10 ) > 100 ){
+                  eio.$element.$value.addClass( 'ge-e-value-error' );
                   GE.beep();
                   event.preventDefault();
                 }
@@ -1001,6 +990,7 @@
             }
           );
         };
+        event.stopPropagation();
       }
     );
 
