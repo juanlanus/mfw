@@ -353,8 +353,9 @@ of client. </p>
 
 <h5>bugs</h5>
 <ol>
-  <li>The validity check of the numeric (number, p100) eval item types is not
-    working</li>
+  <li class="doneItem">The validity check of the numeric (number, p100) eval item
+    types is not working</li>
+  <li class="doneItem">The number-type eval item does not react to hover action</li>
   <li class="doneItem">Focus on a user data element not loading its eval items UI
     any more</li>
   <li class="doneItem">Each time a user is clicked a new version of the eval items
@@ -368,6 +369,8 @@ of client. </p>
   <li class="doneItem">Hovering a binary eval item does not display the would-be
     value</li>
   <li>Hovering a binary eval item always display the would-be value as checked</li>
+  <li>Changing a binary eval item with the keyboard is not reflected by the 
+    value bar</li>
 </ol>
 
 <h5>features</h5>
@@ -397,6 +400,8 @@ of client. </p>
   <li>Whenever a value is changed check if the eval sets are complete and
     display a ✓</li>
   <li class="doneItem">Add a quicksearch widget for the evaluees list</li>
+  <li>The quicksearch should ensure that the found items are not scrolled
+    out of sight</li>
   <li>Add an "evaluation complete" marker in the evaluee's data</li>
   <li>Add an "evaluation complete" marker at the eval items group data (in
     header items)</li>
@@ -469,6 +474,8 @@ of client. </p>
   <li><img alt="doing now" src="res/caramba_yellow.gif">
     Refactor eval items into classes, one per eval item type:
     <ul>
+      <li class="doneItem">Move the code that handles the blur event into the
+        corresponding eval-type objects</li>
       <li class="doneItem">Create an eval item object whenever an eval item
         is built by GE.evalItemsBuild() <ul>
           <li class="doneItem">header type items</li>

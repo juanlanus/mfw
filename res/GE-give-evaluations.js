@@ -1,9 +1,8 @@
-  // GE is the global object that holds "Edit Goals" data
+  // GE is the global object that holds the "Edit Goals" moving parts
   var GE = GE || {};
 
   //================================================================================
   // Class for evaluees
-  //
   //
   //   ######  #    #    ##    #       #    #  ######  ######
   //   #       #    #   #  #   #       #    #  #       #
@@ -12,10 +11,87 @@
   //   #        #  #   #    #  #       #    #  #       #
   //   ######    ##    #    #  ######   ####   ######  ######
   //
+  // There are "users" and "evaluees". 
+  // Users are all those who are registered in the database. 
+  // Evaluees is the subset of those users the current user (the current evaluator)
+  // can evaluate or whose evaluations she's allowed to see: her team, her friends,
+  // those below in the pecking order, whatever, depending on the company policies. 
+  // The users are registered in the users file GE.users. 
+  // The evaluees of an evaluator are organized in "groups" like the team, etc. 
+  // Each group is selected by a custon query that hits the database and collects
+  // a number of users. There might be any number of groups associated with the
+  // current evaluator. 
+  // The system keeps track of those evaluees not included in any previous group 
+  // and can render them as a group perhaps named something like "All others". 
+  // 
+  // For the purpose of this prototype the users file is a JSON and there are two
+  // groups, the "StarMeUp" team group and all the other users.
+  //
+  // There is some intercahgeability in the naming of users and evaluees in the
+  // code, but for the purpose of this, they all are evaluees. 
+
+  GE.evaluees = {}; // the evaluees map {id:..., data:{} }
+
   GE.Evaluee = function( id, data ){
     this.id = id;
     this.data = data;
   };
+
+  // build an evaluee's UI using its data and the template
+  // TODO: this builds all the groups, as the template loops over the list
+  GE.Evaluee.prototype.render = function(){
+    if( ! this.prototype.template ){
+      this.prototype.template = _.template( this.templateSource );
+    };
+    return this.prototype.template( user );
+  };
+
+  GE.Evaluee.prototype.templateSource =
+      '      <li class="ge-oneUser" id="<%= \'ge-user-\' + user.id %>" tabindex="0">' +
+      '        <div class="ge-user-picture" style="background-image:url(res/<%= user.profileImageCode %>.jpg);"></div>' +
+      '        <div class="ge-user-data">' +
+      '          <p class="ge-user-name"><%= user.firstName + \' \' + user.lastName %>' +
+      '          <% if( user.nickname && false ) {%><span class="ge-nickname" title="nickname"><%= user.nickname %></span><% } %></p>' +
+      '          <div class="ge-user-fields">' +
+      '            <p> <span class="ge-field-value"><%= user.seniority %></span>' +
+      '            <% if( user.area ){%><span class="ge-field-name">area:</span><span class="ge-field-value"><%= user.area.trim() %></span><% } %>' +
+      '            <% if( user.project ){%><span class="ge-field-name">project:</span><span class="ge-field-value"><%= user.project.trim() %></span></p><% } %>' +
+      '            <span style="display:inherit; font-size:0;"><%= user.searchCriteria %></span>' +
+      '          </div>' +
+      '        </div>' +
+      '        <div id="ge-evaluations-<%= user.id %>" class="ge-evaluations"> <!-- insert evals here --> </div>' +
+      '      </li> <% }); %>';
+
+  GE.Evaluee.prototype.templateZZZ =
+      '<% var makeEvalueesGroup = function( group, igroup ) { %>' +
+      '<% var users = GE.selectUsers( group.groupId, GE.usersAlreadyListed ); %>' +
+      '  <div class="ge-evalueesGroup" id="ge-evaluees-<%= group.groupName %>">' +
+      '    <p id="ge-title-<%= group.groupName %>" class="ge-title"><%= group.groupDescription %></p>' +
+      '    <ul class="ge-users-group">' +
+      '      <% _.each( users, function( user, key, list ){ %>' +
+      '      <li class="ge-oneUser" id="<%= \'ge-user-\' + user.id %>" tabindex="0">' +
+      '        <div class="ge-user-picture" style="background-image:url(res/<%= user.profileImageCode %>.jpg);"></div>' +
+      '        <div class="ge-user-data">' +
+      '          <p class="ge-user-name"><%= user.firstName + \' \' + user.lastName %>' +
+      '          <% if( user.nickname && false ) {%><span class="ge-nickname" title="nickname"><%= user.nickname %></span><% } %></p>' +
+      '          <div class="ge-user-fields">' +
+      '            <p> <span class="ge-field-value"><%= user.seniority %></span>' +
+      '            <% if( user.area ){%><span class="ge-field-name">area:</span><span class="ge-field-value"><%= user.area.trim() %></span><% } %>' +
+      '            <% if( user.project ){%><span class="ge-field-name">project:</span><span class="ge-field-value"><%= user.project.trim() %></span></p><% } %>' +
+      '            <span style="display:inherit; font-size:0;"><%= user.searchCriteria %></span>' +
+      '          </div>' +
+      '        </div>' +
+      '        <div id="ge-evaluations-<%= user.id %>" class="ge-evaluations"> <!-- insert evals here --> </div>' +
+      '      </li> <% }); %>' +
+      '    </ul>' +
+      '  </div> <% } %>' +
+
+      '<% _.each(' +
+      '  u,' +
+      '  function( group, igroup, groupsList ){' +
+      '    makeEvalueesGroup ( group, igroup );' +
+      '  }' +
+      '); %>';
 
   //================================================================================
   // Class for header-type eval items
@@ -114,6 +190,14 @@
         break;
     }
   };
+  GE.EvalItemNumber.prototype.handleBlur = function( blurEvent ){
+    this.$element.$display.removeClass( 'ge-e-value-error' );
+    if( parseInt( this.$element.$display.val(), 10 ) > this.evalItem.topValue ){
+      this.$element.$display.addClass( 'ge-e-value-error' );
+      GE.beep();
+      blurEvent.preventDefault();
+    }
+  };
 
   // click on the value bar to set a new value
   GE.EvalItemNumber.prototype.handleClick = function( clickEvent ){
@@ -127,7 +211,7 @@
     this.showText( this.eval.text );
   };
 
-  // manage keyboard input
+  // handle keyboard input
   GE.EvalItemNumber.prototype.handleKeydown = function( keyEvent ){
     if( ! GE.isDigit( String.fromCharCode( keyEvent.which ) ) ){ keyEvent.preventDefault(); }
   };
@@ -210,6 +294,14 @@
         break;
     }
   };
+  GE.EvalItemP100.prototype.handleBlur = function( blurEvent ){
+    this.$element.$display.removeClass( 'ge-e-value-error' );
+    if( parseInt( this.$element.$display.val(), 10 ) > 100 ){
+      this.$element.$display.addClass( 'ge-e-value-error' );
+      GE.beep();
+      event.preventDefault();
+    }
+  };
 
   // click on the value bar to set a new value
   GE.EvalItemP100.prototype.handleClick = function( clickEvent ){
@@ -223,7 +315,7 @@
     this.showText( this.eval.text );
   };
 
-  // manage keyboard input
+  // handle keyboard input
   GE.EvalItemP100.prototype.handleKeydown = function( keyEvent ){
     if( ! GE.isDigit( String.fromCharCode( keyEvent.which ) ) ){ keyEvent.preventDefault(); }
   };
@@ -307,6 +399,8 @@
         break;
     }
   };
+  GE.EvalItemBinary.prototype.handleBlur = function( blurEvent ){
+  };
 
   // click on the value bar to set a new value
   GE.EvalItemBinary.prototype.handleClick = function( clickEvent ){
@@ -323,7 +417,7 @@
     this.showText( this.eval.text );
   };
 
-  // manage keyboard input
+  // handle keyboard input
   GE.EvalItemBinary.prototype.handleKeydown = function( keyEvent ){
     var $eventTarget = $( keyEvent.target );
     switch( keyEvent.which ){
@@ -437,6 +531,8 @@
       break;
     }
   };
+  GE.EvalItemStep.prototype.handleBlur = function( blurEvent ){
+  };
 
   // click on the value bar to set a new value
   GE.EvalItemStep.prototype.handleClick = function( clickEvent ){
@@ -448,7 +544,7 @@
     clickEvent.stopPropagation();
   };
 
-  // manage keyboard input
+  // handle keyboard input
   GE.EvalItemStep.prototype.handleKeydown = function( keyEvent ){
     // do nothing: QuickSearch does it
   };
@@ -670,21 +766,43 @@
 
   GE.currentUser = null; // selected user's file entry
 
+  GE.mouseIsDown = false; // used to detect mouse vs. tab events
+
   //================================================================================
 
   // build users list
-  GE.builsUsersList = function(){
-    // console.log( 'GE.users: ' + GE.users.length );  // JSON.stringify( GE.users, null, 2 ) );
-    GE.usersAlreadyListed = []; // no users listed
+  GE.buildUsersList = function(){
+    GE.usersAlreadyListed = []; // no users listed initially
     var templateSource = _.template( $( 'script#ge-template-users' ).html() ).source; // precompilation?
     var templateForUsers = _.template( $( 'script#ge-template-users' ).html() );
     var HTMLForUsers = templateForUsers( GE.userGroups );
     $( '#ge-evalueeGroups' ).html( HTMLForUsers );
     // add empty padding at the bottom of the users list to ensure scroll to top
-    $( '#ge-padding' ).height( window.height);
+    $( '#ge-padding' ).height( window.screen.height );
   };
 
-  // Access users file with an id as the key
+  // Return the users belonging to a user group (a query)
+  GE.selectUsers = function( groupId, usersAlreadyListed ){
+    var thisGroup = [];
+    _.each(
+      GE.users,
+      function( thisUser, i, allUsers ){
+        if( groupId === '*' ){
+          if( ! usersAlreadyListed[ i ] ){
+            thisGroup.push( thisUser);
+          }
+        } else {
+          if( thisUser.project === groupId ){
+            thisGroup.push( thisUser);
+            usersAlreadyListed[ i ] = true;
+          }
+        }
+      }
+    );
+    return thisGroup;
+  };
+
+  // Access users file with a user id as the key
   GE.getUserData = function( currentUserId ){
     return _.find( GE.users, function( user ){ return user.id == currentUserId; } );
   };
@@ -741,27 +859,6 @@
       // the existing eval[0] is the first one
     };
     return e;
-  };
-
-  // Return the users belonging to a user group (a query)
-  GE.selectUsers = function( groupId, usersAlreadyListed ){
-    var thisGroup = [];
-    _.each(
-      GE.users,
-      function( thisUser, i, allUsers ){
-        if( groupId === '*' ){
-          if( ! usersAlreadyListed[ i ] ){
-            thisGroup.push( thisUser);
-          }
-        } else {
-          if( thisUser.project === groupId ){
-            thisGroup.push( thisUser);
-            usersAlreadyListed[ i ] = true;
-          }
-        }
-      }
-    );
-    return thisGroup;
   };
 
   GE.putCurrentUserEvals = function( ){
@@ -899,91 +996,85 @@
     )
   };
 
-  GE.resetEvalItemKBHandler = function( $eventTarget ){
-    // unbind quicksearch of this step element
+  GE.isDigit = (function(){
+    // return true if the single char argument is a decimal digit
+    var matchSingleDigit = /^\d$/;
+    return function( char ) {
+      return matchSingleDigit.test( char );
+    }
+  }());
+
+  GE.selectElementText = function( el ){
+    var r, s;
+    if( window.getSelection ){
+      s = window.getSelection();
+      r = document.createRange();
+      r.selectNodeContents( el );
+      s.removeAllRanges();
+      s.addRange( r );
+    } else {
+      r = document.body.createTextRange();
+      r.moveToElementText( el );
+      r.select();
+    }
   };
 
-    GE.mouseIsDown = false;
-
-    GE.isDigit = (function(){
-      // return true if the single char argument is a decimal digit
-      var matchSingleDigit = /^\d$/;
-      return function( char ) {
-        return matchSingleDigit.test( char );
-      }
-    }());
-
-    GE.selectElementText = function( el ){
-      var r, s;
-      if( window.getSelection ){
-        s = window.getSelection();
-        r = document.createRange();
-        r.selectNodeContents( el );
-        s.removeAllRanges();
-        s.addRange( r );
-      } else {
-        r = document.body.createTextRange();
-        r.moveToElementText( el );
-        r.select();
-      }
-    };
-
-    GE.beep = function() {
-      var beepSound = new Audio('data:audio/wav;base64,//uQRAAAAWMSLwUIYAAsYkXgoQwAEaYLWfkWgAI0wWs/It' +
-          'AAAGDgYtAgAyN+QWaAAihwMWm4G8QQRDiMcCBcH3Cc+CDv/7xA4Tvh9Rz/y8QADBwMWgQAZG/ILNAARQ4GLTcDeI' +
-          'IIhxGOBAuD7hOfBB3/94gcJ3w+o5/5eIAIAAAVwWgQAVQ2ORaIQwEMAJiDg95G4nQL7mQVWI6GwRcfsZAcsKkJvx' +
-          'gxEjzFUgfHoSQ9Qq7KNwqHwuB13MA4a1q/DmBrHgPcmjiGoh//EwC5nGPEmS4RcfkVKOhJf+WOgoxJclFz3kgn//' +
-          'dBA+ya1GhurNn8zb//9NNutNuhz31f////9vt///z+IdAEAAAK4LQIAKobHItEIYCGAExBwe8jcToF9zIKrEdDYI' +
-          'uP2MgOWFSE34wYiR5iqQPj0JIeoVdlG4VD4XA67mAcNa1fhzA1jwHuTRxDUQ//iYBczjHiTJcIuPyKlHQkv/LHQU' +
-          'YkuSi57yQT//uggfZNajQ3Vmz+Zt//+mm3Wm3Q576v////+32///5/EOgAAADVghQAAAAA//uQZAUAB1WI0PZugA' +
-          'AAAAoQwAAAEk3nRd2qAAAAACiDgAAAAAAABCqEEQRLCgwpBGMlJkIz8jKhGvj4k6jzRnqasNKIeoh5gI7BJaC1A1' +
-          'AoNBjJgbyApVS4IDlZgDU5WUAxEKDNmmALHzZp0Fkz1FMTmGFl1FMEyodIavcCAUHDWrKAIA4aa2oCgILEBupZgH' +
-          'vAhEBcZ6joQBxS76AgccrFlczBvKLC0QI2cBoCFvfTDAo7eoOQInqDPBtvrDEZBNYN5xwNwxQRfw8ZQ5wQVLvO8O' +
-          'YU+mHvFLlDh05Mdg7BT6YrRPpCBznMB2r//xKJjyyOh+cImr2/4doscwD6neZjuZR4AgAABYAAAABy1xcdQtxYBY' +
-          'YZdifkUDgzzXaXn98Z0oi9ILU5mBjFANmRwlVJ3/6jYDAmxaiDG3/6xjQQCCKkRb/6kg/wW+kSJ5//rLobkLSiKm' +
-          'qP/0ikJuDaSaSf/6JiLYLEYnW/+kXg1WRVJL/9EmQ1YZIsv/6Qzwy5qk7/+tEU0nkls3/zIUMPKNX/6yZLf+kFgA' +
-          'fgGyLFAUwY//uQZAUABcd5UiNPVXAAAApAAAAAE0VZQKw9ISAAACgAAAAAVQIygIElVrFkBS+Jhi+EAuu+lKAkYU' +
-          'EIsmEAEoMeDmCETMvfSHTGkF5RWH7kz/ESHWPAq/kcCRhqBtMdokPdM7vil7RG98A2sc7zO6ZvTdM7pmOUAZTnJW' +
-          '+NXxqmd41dqJ6mLTXxrPpnV8avaIf5SvL7pndPvPpndJR9Kuu8fePvuiuhorgWjp7Mf/PRjxcFCPDkW31srioCEx' +
-          'ivv9lcwKEaHsf/7ow2Fl1T/9RkXgEhYElAoCLFtMArxwivDJJ+bR1HTKJdlEoTELCIqgEwVGSQ+hIm0NbK8WXcTE' +
-          'I0UPoa2NbG4y2K00JEWbZavJXkYaqo9CRHS55FcZTjKEk3NKoCYUnSQ0rWxrZbFKbKIhOKPZe1cJKzZSaQrIyULH' +
-          'DZmV5K4xySsDRKWOruanGtjLJXFEmwaIbDLX0hIPBUQPVFVkQkDoUNfSoDgQGKPekoxeGzA4DUvnn4bxzcZrtJyi' +
-          'pKfPNy5w+9lnXwgqsiyHNeSVpemw4bWb9psYeq//uQZBoABQt4yMVxYAIAAAkQoAAAHvYpL5m6AAgAACXDAAAAD5' +
-          '9jblTirQe9upFsmZbpMudy7Lz1X1DYsxOOSWpfPqNX2WqktK0DMvuGwlbNj44TleLPQ+Gsfb+GOWOKJoIrWb3cIM' +
-          'eeON6lz2umTqMXV8Mj30yWPpjoSa9ujK8SyeJP5y5mOW1D6hvLepeveEAEDo0mgCRClOEgANv3B9a6fikgUSu/Dm' +
-          'AMATrGx7nng5p5iimPNZsfQLYB2sDLIkzRKZOHGAaUyDcpFBSLG9MCQALgAIgQs2YunOszLSAyQYPVC2YdGGeHD2' +
-          'dTdJk1pAHGAWDjnkcLKFymS3RQZTInzySoBwMG0QueC3gMsCEYxUqlrcxK6k1LQQcsmyYeQPdC2YfuGPASCBkcVM' +
-          'QQqpVJshui1tkXQJQV0OXGAZMXSOEEBRirXbVRQW7ugq7IM7rPWSZyDlM3IuNEkxzCOJ0ny2ThNkyRai1b6ev//3' +
-          'dzNGzNb//4uAvHT5sURcZCFcuKLhOFs8mLAAEAt4UWAAIABAAAAAB4qbHo0tIjVkUU//uQZAwABfSFz3ZqQAAAAA' +
-          'ngwAAAE1HjMp2qAAAAACZDgAAAD5UkTE1UgZEUExqYynN1qZvqIOREEFmBcJQkwdxiFtw0qEOkGYfRDifBui9MQg' +
-          '4QAHAqWtAWHoCxu1Yf4VfWLPIM2mHDFsbQEVGwyqQoQcwnfHeIkNt9YnkiaS1oizycqJrx4KOQjahZxWbcZgztj2' +
-          'c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtEr' +
-          'm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+' +
-          'sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQ' +
-          'NpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho' +
-          '1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH100' +
-          '00EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu' +
-          '9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqA' +
-          'rFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoO' +
-          'IAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40Go' +
-          'iiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIa' +
-          'CrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg' +
-          '+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb///' +
-          '////////////////////////////////////////////////////////////////////////////////////////' +
-          '////////////////////////////////////////////////////////////////////////////////////////' +
-          '////////////////////////////////////////////////////////////////////////////////////////' +
-          '////////////////////////////////////////////////////////////////////////////////////////' +
-          '//////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAA' +
-          'AAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
-          'AAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=');
-      // These lines are suspected to raise an error in ff:
-      // cancel any ongoing beep just before shooting a new one
-      // if( ! beepSound.paused ){
-      //   beepSound.pause();
-      //   beepSound.currentTime = 0;
-      // }
-      beepSound.play();
-    };
+  GE.beep = function() {
+    var beepSound = new Audio('data:audio/wav;base64,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' +
+        'iiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIa' +
+        'CrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg' +
+        '+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb///' +
+        '////////////////////////////////////////////////////////////////////////////////////////' +
+        '////////////////////////////////////////////////////////////////////////////////////////' +
+        '////////////////////////////////////////////////////////////////////////////////////////' +
+        '////////////////////////////////////////////////////////////////////////////////////////' +
+        '//////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAA' +
+        'AAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' +
+        'AAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=');
+    // These lines are suspected to raise an error in ff:
+    // cancel any ongoing beep just before shooting a new one
+    // if( ! beepSound.paused ){
+    //   beepSound.pause();
+    //   beepSound.currentTime = 0;
+    // }
+    beepSound.play();
+  };
 
   //================================================================================
   // START HERE:
@@ -994,7 +1085,7 @@
   $(document).ready( function (){
 
     // build users list
-    GE.builsUsersList();
+    GE.buildUsersList();
 
     // handle click event on a user data or on evaluations
     $( '#ge-evalueeGroups .ge-users-group' ).on(
@@ -1058,34 +1149,14 @@
         var $eventTarget = $( event.target );
         if( $eventTarget.hasClass( 'ge-oneUser' ) ){      // focus on evaluee header
           $eventTarget.trigger( { type: 'mouseup', which: 1 } ); // user: display eval items UI
-          console.log( '\nfocus on an evaluee ' + $( event.target ).find( '.ge-user-name' ).text().trim() );
         } else {                                          // focus on eval item
           var eio = GE.getEvalItemData( $eventTarget );   // the eval item object
-          GE.activateEvalItemKBHandler( $eventTarget );
+          GE.activateEvalItemKBHandler( $eventTarget );   // TODO: this does nothing
           $eventTarget.one(                               // set blur event
             'blur',
             eio,
             function( event ){
-              GE.resetEvalItemKBHandler( eio.$element.$value );
-              eio.$element.$value.removeClass( 'ge-e-value-error' );
-              switch ( eio.evalItem.type ){
-              case 'number':
-                if( parseInt( eio.$element.$value.val(), 10 ) > eio.evalItem.topValue ){
-                  eio.$element.$value.addClass( 'ge-e-value-error' );
-                  GE.beep();
-                  event.preventDefault();
-                }
-                break;
-              case 'p100':
-                if( parseInt( eio.$element.$value.val(), 10 ) > 100 ){
-                  eio.$element.$value.addClass( 'ge-e-value-error' );
-                  GE.beep();
-                  event.preventDefault();
-                }
-                break;
-              default:
-                break;
-              };
+              eio.handleBlur && eio.handleBlur( event );
             }
           );
         };
